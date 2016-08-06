@@ -1,26 +1,46 @@
-from django.shortcuts import render, redirect
+import random
 
-from .forms import TesteeForm
-from .models import Testee, ContextSet
+from django.shortcuts import render, redirect, Http404
+
+from .forms import ParticipantForm
+from .models import Participant, ContextSet, ContextGroup
 
 
 def start_survey(request):
     if request.method == 'POST':
-        form = TesteeForm(request.POST)
+        form = ParticipantForm(request.POST)
         if form.is_valid():
-            testee = form.save()
-            return redirect('survey_step', str(testee.id), 0)
+            participant = form.save()
+            return redirect('survey_step', str(participant.id), 0)
     else:
-        form = TesteeForm()
+        form = ParticipantForm()
     return render(request, 'start_survey.html', {
         'form': form,
     })
 
 
-def survey_step(request, testee_id, step):
-    testee = Testee.objects.get(pk=testee_id)
-    contexts = ContextSet.objects.all()[int(step)]
+def survey_step(request, participant_id, step):
+    step = int(step)
+    participant = Participant.objects.get(pk=participant_id)
+    try:
+        context_set = ContextSet.objects.all()[step]
+    except IndexError:
+        raise Http404
+    disabled = (
+        ContextGroup.objects
+            .filter(participant=participant, context_set=context_set)
+            .exists())
+    last_step = ContextSet.objects.count() - 1
+    contexts = list(context_set.context_set.all())
+    random.shuffle(contexts)
     return render(request, 'survey_step.html', {
-        'testee': testee,
+        'participant': participant,
+        'word': context_set.word,
         'contexts': contexts,
+        'disabled': disabled,
+        'next_step': (step + 1) if step < last_step else None,
     })
+
+
+def finish_survey(request):
+    return render(request, 'finish_survey.html')

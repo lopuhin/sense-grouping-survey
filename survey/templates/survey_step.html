@@ -1,7 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-    Testee: {{ testee }}
+    Participant: {{ participant.pk }}
     <br/>
-    Contexts: {{ contexts }}
+
+    {{ word }}
+
+    {% if disabled %}
+
+    Вы уже сгруппировали эти контексты.
+
+    {% else %}
+
+    <ul>
+        {%  for ctx in contexts %}
+            <li>{{ ctx.text }}</li>
+        {% endfor %}
+    </ul>
+
+    {% endif %} {# disabled #}
+
+    {% if next_step %}
+        <a href="{% url "survey_step" participant.pk next_step %}">Далее</a>
+    {% else %}
+        <a href="{% url "finish_survey" %}">Закончить</a>
+    {% endif %}
+
 {% endblock %}

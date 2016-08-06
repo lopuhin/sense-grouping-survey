@@ -3,10 +3,45 @@ import uuid
 from django.db import models
 
 
-class Testee(models.Model):
+class Named(models.Model):
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+
+class LeadingHand(Named):
+    pass
+
+
+class Sex(Named):
+    pass
+
+
+class Education(Named):
+    pass
+
+
+class Speciality(Named):
+    pass
+
+
+class Participant(models.Model):
+    """ Survey participant.
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    speciality = models.ForeignKey(Speciality, verbose_name='Образование')
     age = models.PositiveIntegerField(verbose_name='Возраст')
-    # TODO - other demographic fields
+    leading_hand = models.ForeignKey(LeadingHand, verbose_name='Ведущая рука')
+    sex = models.ForeignKey(Sex, verbose_name='Пол')
+    languages = models.TextField(
+        verbose_name='Родной язык/языки',
+        help_text='пожалуйста, перечислите все')
+    education = models.ForeignKey(
+        Education, verbose_name='Последняя законченная ступень образования')
 
     class Meta:
         verbose_name = 'Испытуемый'
@@ -41,13 +76,13 @@ class Context(models.Model):
 
 
 class ContextGroup(models.Model):
-    """ A grouping of contexts by the testee.
+    """ A grouping of contexts by a participant.
     """
-    testee = models.ForeignKey(Testee)
+    participant = models.ForeignKey(Participant)
     context_set = models.ForeignKey(ContextSet)
     contexts = models.ManyToManyField(Context)
 
     class Meta:
-        unique_together = [['testee', 'context_set']]
+        unique_together = [['participant', 'context_set']]
         verbose_name = 'Группировка контекстов'
         verbose_name_plural = 'Группировки контекстов'

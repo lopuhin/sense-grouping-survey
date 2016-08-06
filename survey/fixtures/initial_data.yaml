@@ -1,0 +1,94 @@
+- model: survey.leadinghand
+  pk: 1
+  fields:
+    name: правая
+
+- model: survey.leadinghand
+  pk: 2
+  fields:
+    name: левая
+
+- model: survey.leadinghand
+  pk: 3
+  fields:
+    name: владею обеими руками одинаково
+
+- model: survey.leadinghand
+  pk: 4
+  fields:
+    name: переученный левша
+
+- model: survey.sex
+  pk: 1
+  fields:
+    name: женский
+
+- model: survey.sex
+  pk: 2
+  fields:
+    name: мужской
+
+- model: survey.education
+  pk: 1
+  fields:
+    name: средняя школа
+
+- model: survey.education
+  pk: 2
+  fields:
+    name: школа
+
+- model: survey.education
+  pk: 3
+  fields:
+    name: бакалавриат
+
+- model: survey.education
+  pk: 4
+  fields:
+    name: магистратура
+
+- model: survey.education
+  pk: 5
+  fields:
+    name: специалитет
+
+- model: survey.education
+  pk: 6
+  fields:
+    name: аспирантура
+
+- model: survey.education
+  pk: 7
+  fields:
+    name: докторантура
+
+- model: survey.speciality
+  pk: 1
+  fields:
+    name: лингвист
+
+- model: survey.speciality
+  pk: 2
+  fields:
+    name: филолог
+
+- model: survey.speciality
+  pk: 3
+  fields:
+    name: преподаватель русского языка как иностранного
+
+- model: survey.speciality
+  pk: 4
+  fields:
+    name: преподаватель русского языка / литературы
+
+- model: survey.speciality
+  pk: 5
+  fields:
+    name: переводчик
+
+- model: survey.speciality
+  pk: 6
+  fields:
+    name: ни один из перечисленных

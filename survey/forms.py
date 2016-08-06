@@ -1,9 +1,9 @@
 from django import forms
 
-from .models import Testee
+from .models import Participant
 
 
-class TesteeForm(forms.ModelForm):
+class ParticipantForm(forms.ModelForm):
     class Meta:
-        model = Testee
-        exclude = []
+        model = Participant
+        exclude = ['id']
