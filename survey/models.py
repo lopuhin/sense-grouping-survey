@@ -42,6 +42,8 @@ class Participant(models.Model):
         help_text='пожалуйста, перечислите все')
     education = models.ForeignKey(
         Education, verbose_name='Последняя законченная ступень образования')
+    email = models.EmailField(blank=True, null=True)
+    feedback = models.TextField(blank=True, default='')
 
     class Meta:
         verbose_name = 'Испытуемый'

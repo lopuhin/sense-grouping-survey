@@ -8,8 +8,10 @@ import survey.views
 
 urlpatterns = [
     url(r'^$', survey.views.start_survey, name='start_survey'),
-    url(r'^group/([\w\-]+)/(\d+)/$',
-        survey.views.survey_step, name='survey_step'),
+    url(r'^group/([\w\-]+)/(\d+)/$', survey.views.survey_step,
+        name='survey_step'),
+    url(r'^feedback/([\w\-]+)/$', survey.views.survey_feedback,
+        name='survey_feedback'),
     url(r'^finish/$', survey.views.finish_survey, name='finish_survey'),
     url(r'^admin/', admin.site.urls),
     url(r'^static/(?P<path>.*)$', static.serve,

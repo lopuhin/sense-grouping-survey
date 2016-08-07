@@ -2,7 +2,7 @@ import random
 
 from django.shortcuts import render, redirect, Http404
 
-from .forms import ParticipantForm
+from .forms import ParticipantForm, FeedbackForm
 from .models import Participant, ContextSet, ContextGroup
 
 
@@ -40,6 +40,18 @@ def survey_step(request, participant_id, step):
         'disabled': disabled,
         'next_step': (step + 1) if step < last_step else None,
     })
+
+
+def survey_feedback(request, participant_id):
+    participant = Participant.objects.get(pk=participant_id)
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST, instance=participant)
+        if form.is_valid():
+            form.save()
+            return redirect('finish_survey')
+    else:
+        form = FeedbackForm(instance=participant)
+    return render(request, 'survey_feedback.html', {'form': form})
 
 
 def finish_survey(request):

@@ -6,4 +6,11 @@ from .models import Participant
 class ParticipantForm(forms.ModelForm):
     class Meta:
         model = Participant
-        exclude = ['id']
+        fields = ['speciality', 'age', 'leading_hand', 'sex', 'languages',
+                  'education']
+
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Participant
+        fields = ['email', 'feedback']

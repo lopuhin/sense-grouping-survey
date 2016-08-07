@@ -23,7 +23,7 @@
     {% if next_step %}
         <a href="{% url "survey_step" participant.pk next_step %}">Далее</a>
     {% else %}
-        <a href="{% url "finish_survey" %}">Закончить</a>
+        <a href="{% url "survey_feedback" participant.pk %}">Закончить</a>
     {% endif %}
 
 {% endblock %}
