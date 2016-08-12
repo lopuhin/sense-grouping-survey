@@ -1,76 +1,129 @@
-var number_groups = 1
-var title = "Гранат"
-var words = [
-"спелый гранат",
-"вкусные гранаты",
-"почистить гранат",
-"съесть гранат",
-"посадить гранат",
-"цветущие гранаты",
-"Гранаты любят тепло",
-"В саду росли гранаты",
-"неограненный гранат",
-"добывать гранат",
-"месторождение граната",
-"ожерелье из граната"
-]
-var result={
-  group_1:[],
-  group_2:[],
-  group_3:[],
-  group_4:[],
-  group_5:[],
-  group_6:[],
-  group_7:[],
-  group_8:[],
-  group_9:[],
-  group_10:[],
-}
+var number_groups, max_groups;
 
 $(document).ready(function(){
- 
-  $(".new_group").on("click", function(){
-    create_group();
-  })
-  $(".next_group").on("click", function(){
-    next_group();
-  })
-   push_words();
-   var color = generate()
-   $('.groups').css('background-color',color)
-}); 
-  
-var push_words = function(){
-  $('.title').html(title)
-  for (var i =1; i<=10; i++) {
-    $('#mess_'+i).html(words[i-1])
-  };
-}
-var create_group=function(){
+    $('.new_group').on('click', function(){
+        create_group();
+    });
+    $('.next_group').on('click', function(){
+        next_group();
+    });
+    push_words();
+});
 
-  if (number_groups>=10 || $("#section > p").length==0) {alert('максимальное количество групп созданно')}
-    else{
-      number_groups++;
-      var color = generate()
-      $("#groups").append('<div class="groups" style="background-color:'+color+'"><div name="text" id="group_'+number_groups+'" class="user_group"  cols="30" rows="10" ondragenter="return dragEnter(event)" ondrop="dragDrop1(event)" ondragover="return dragOver(event)"></div></div>')
-      
+function push_words() {
+    if (to_group.length === 0) {
+        window.location = feedback_url;
+        return;
+    }
+    var $parent = $('#section');
+    $parent.children().remove();
+    var group = to_group.pop();
+    max_groups = group.contexts.length;
+    number_groups = 0;
+    $('#groups').children().remove();
+    create_group();
+    $parent.append('<h1 class="title">' + group.word + '</h1>');
+    for (var i = 0; i < group.contexts.length; i++) {
+        var context = group.contexts[i];
+        $parent.append(
+            '<p class="drag" id="ctx_' + context.id +
+            '" draggable="true" ondragstart="return dragStart(event)">' +
+            context.text + '</p>');
     }
 }
-var next_group = function(){
-  if ($("#section > p").length==0) {
-    for (var i = 1; i <= 10; i++) {
-        var mess = $('#mess_'+i).html()
-        var group = $('#mess_'+i).parent()
-        var id = group[0].id
-        result[id].push(mess)
-    };
-    console.log(result)
-   $.ajax({
-    type: 'POST',
-    url: url,
-    data: result,
-    success: push_words()
-  });
 
-  };
+function create_group() {
+  if (number_groups >= max_groups) {
+      alert('максимальное количество групп созданно')
+  } else {
+      number_groups += 1;
+      var color = generate();
+      $("#groups").append(
+          '<div class="groups" style="background-color:' +
+          color + '">' +
+          '<div name="text" id="group_' + number_groups +
+          '" class="user_group"  cols="30" rows="10" ' +
+          'ondragenter="return dragEnter(event)" ' +
+          'ondrop="dragDrop(event)" ' +
+          'ondragover="return dragOver(event)">' +
+          '</div></div>');
+    }
+}
+
+function all_grouped() {
+    return $('#section').find('>p').length === 0;
+}
+
+function next_group() {
+    if (all_grouped()) {
+        var grouping = {};
+        $('p.drag').each(function (idx, el) {
+            var group_id = $(el).parent()[0].id.split('_')[1];
+            if (!grouping[group_id]) {
+                grouping[group_id] = [];
+            }
+            grouping[group_id].push(el.id.split('_')[1]);
+        });
+        console.log(grouping);
+        $.ajax({
+            type: 'POST',
+            url: './',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                grouping: JSON.stringify(grouping)
+            },
+            success: push_words
+        });
+    }
+}
+
+var dragged_id;
+
+function dragStart(ev) {
+    ev.dataTransfer.effectAllowed='move';
+    ev.dataTransfer.dropEffect='move';
+    ev.dataTransfer.setData('Text', ev.target.getAttribute('id'));
+    dragged_id = ev.target.getAttribute('id');
+    return true;
+}
+
+function dragEnter(ev) {
+    ev.preventDefault();
+    return true;
+}
+
+function dragOver(ev) {
+    ev.preventDefault();
+    return true;
+}
+
+function dragDrop(ev) {
+    var $target = $(ev.target);
+    if ($target.hasClass('user_group') || $target.hasClass('mess_group')) {
+        ev.target.appendChild(document.getElementById(dragged_id));
+    } else if ($target.hasClass('drag')) {
+        $target.parent()[0].appendChild(document.getElementById(dragged_id));
+    }
+    set_circle_size(dragged_id);
+    set_next_button_state();
+    ev.stopPropagation();
+    return false;
+}
+
+function set_circle_size(id) {
+    var group = $('#' + id).parent();
+    var width = group.width();
+    var height = group.height();
+    if (width < height && group.hasClass('user_group')) {
+        group.css('width',height)
+    }
+}
+
+function set_next_button_state() {
+    var $btn = $('div.next_group');
+    if (all_grouped()) {
+        $btn.removeClass('disabled');
+    } else {
+        $btn.addClass('disabled');
+    }
 }

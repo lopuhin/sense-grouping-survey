@@ -1,11 +1,12 @@
 import json
+import random
 
 from django.views import View
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, Http404, reverse, HttpResponse
 
 from .forms import ParticipantForm, FeedbackForm
-from .models import Participant, ContextSet, ContextGroup
+from .models import Participant, ContextGroup, Context
 
 
 class Start(View):
@@ -15,39 +16,64 @@ class Start(View):
         })
 
     def post(self, request):
-        result = {}
         form = ParticipantForm(request.POST)
         if form.is_valid():
             participant = form.save()
-            result['next'] = reverse('survey_step', args=[str(participant.id), 0])
-            response_cls = HttpResponse
+            return json_response(
+                {'next': reverse('survey_step', args=[participant])})
         else:
-            response_cls = HttpResponseBadRequest
-            result['error'] = str(form.errors())
-        return response_cls(json.dumps(result), content_type='text/json')
+            # TODO - show it
+            return json_response(
+                {'error': str(form.errors())},
+                response_cls=HttpResponseBadRequest)
 
 
-class Step(View):
-    def get(self, request, participant_id, step):
-        step = int(step)
+class Group(View):
+    def get(self, request, participant_id):
         participant = Participant.objects.get(pk=participant_id)
-        try:
-            context_set = ContextSet.objects.all()[step]
-        except IndexError:
-            raise Http404
-        disabled = (
-            ContextGroup.objects
-                .filter(participant=participant, context_set=context_set)
-                .exists())
-        last_step = ContextSet.objects.count() - 1
-        contexts = list(context_set.context_set.all())
-        return render(request, 'survey/step.html', {
+        grouped = set(
+            ContextGroup.objects.filter(participant=participant)
+            .values_list('context_set_id', flat=True))
+        to_group = {}
+        for context in Context.objects.select_related('context_set'):
+            cs = context.context_set
+            if cs.id not in grouped:
+                cs_dict = to_group.setdefault(cs.id, {
+                    'id': cs.id,
+                    'word': cs.word,
+                    'contexts': []})
+                cs_dict['contexts'].append(
+                    {'id': context.id, 'text': context.text})
+        to_group = list(to_group.values())
+        random.shuffle(to_group)
+        if not to_group:
+            return redirect('survery_feedback', participant)
+        return render(request, 'survey/group.html', {
             'participant': participant,
-            'word': context_set.word,
-            'contexts': contexts,
-            'disabled': disabled,
-            'next_step': (step + 1) if step < last_step else None,
+            'to_group': json.dumps(to_group),
         })
+
+    def post(self, request, participant_id):
+        participant = Participant.objects.get(pk=participant_id)
+        grouping = json.loads(request.POST['grouping'])
+        context_set = None
+        for group in grouping.values():
+            group_contexts = []
+            for ctx_id in group:
+                context = Context.objects.get(pk=int(ctx_id))
+                group_contexts.append(context)
+                if context_set is None:
+                    context_set = context.context_set
+                    # clean up old contexts
+                    (ContextGroup.objects
+                        .filter(participant=participant, context_set=context_set)
+                        .delete())
+            if group_contexts:
+                context_group = ContextGroup.objects.create(
+                    participant=participant,
+                    context_set=context_set)
+                context_group.contexts.add(*group_contexts)
+        return json_response({})
 
 
 def survey_feedback(request, participant_id):
@@ -59,8 +85,14 @@ def survey_feedback(request, participant_id):
             return redirect('finish_survey')
     else:
         form = FeedbackForm(instance=participant)
-    return render(request, 'survey_feedback.html', {'form': form})
+    return render(request, 'survey/feedback.html', {'form': form})
 
 
 def finish_survey(request):
-    return render(request, 'finish_survey.html')
+    return render(request, 'survery/finish.html')
+
+
+def json_response(data, response_cls=HttpResponse):
+    return response_cls(json.dumps(data), content_type='text/json')
+
+

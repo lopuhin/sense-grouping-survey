@@ -38,24 +38,25 @@ class Participant(models.Model):
         help_text='пожалуйста, перечислите все')
     education = models.ForeignKey(
         Education, verbose_name='Последняя законченная ступень образования')
-    email = models.EmailField(blank=True, null=True)
+    email = models.TextField(blank=True, null=True)
     feedback = models.TextField(blank=True, default='')
 
     class Meta:
         verbose_name = 'Испытуемый'
         verbose_name_plural = 'Испытуемые'
 
+    def __str__(self):
+        return str(self.id)
+
 
 class ContextSet(models.Model):
     """ A set of contexts to be grouped.
     """
     word = models.TextField()
-    order = models.FloatField()
 
     class Meta:
         verbose_name = 'Набор контекстов для слова'
         verbose_name_plural = 'Наборы контекстов для слов'
-        ordering = ['order']
 
     def __str__(self):
         return self.word
@@ -69,6 +70,7 @@ class Context(models.Model):
     class Meta:
         verbose_name = 'Контекст'
         verbose_name_plural = 'Контексты'
+        ordering = ['order']
 
     def __str__(self):
         return '{} ({})'.format(self.text, self.context_set)
@@ -82,6 +84,5 @@ class ContextGroup(models.Model):
     contexts = models.ManyToManyField(Context)
 
     class Meta:
-        unique_together = [['participant', 'context_set']]
         verbose_name = 'Группировка контекстов'
         verbose_name_plural = 'Группировки контекстов'

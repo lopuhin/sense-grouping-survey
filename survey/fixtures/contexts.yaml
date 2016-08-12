@@ -2,7 +2,6 @@
   pk: 1
   fields:
     word: гранат
-    order: 1.0
 
 - model: survey.context
   pk: 1
@@ -91,9 +90,7 @@
 - model: survey.contextset
   pk: 2
   fields:
-    order: 1
     word: каторга
-    order: 2.0
 
 - model: survey.context
   pk: 13

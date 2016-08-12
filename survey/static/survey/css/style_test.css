@@ -84,3 +84,7 @@ span {
 .new_group:hover, .next_group:hover{
   background-color: #7EBE3B;
 }
+.next_group.disabled{
+  background-color: lightgray;
+  cursor: not-allowed;
+}
