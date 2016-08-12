@@ -27,26 +27,27 @@ class Start(View):
         return response_cls(json.dumps(result), content_type='text/json')
 
 
-def survey_step(request, participant_id, step):
-    step = int(step)
-    participant = Participant.objects.get(pk=participant_id)
-    try:
-        context_set = ContextSet.objects.all()[step]
-    except IndexError:
-        raise Http404
-    disabled = (
-        ContextGroup.objects
-            .filter(participant=participant, context_set=context_set)
-            .exists())
-    last_step = ContextSet.objects.count() - 1
-    contexts = list(context_set.context_set.all())
-    return render(request, 'survey_step.html', {
-        'participant': participant,
-        'word': context_set.word,
-        'contexts': contexts,
-        'disabled': disabled,
-        'next_step': (step + 1) if step < last_step else None,
-    })
+class Step(View):
+    def get(self, request, participant_id, step):
+        step = int(step)
+        participant = Participant.objects.get(pk=participant_id)
+        try:
+            context_set = ContextSet.objects.all()[step]
+        except IndexError:
+            raise Http404
+        disabled = (
+            ContextGroup.objects
+                .filter(participant=participant, context_set=context_set)
+                .exists())
+        last_step = ContextSet.objects.count() - 1
+        contexts = list(context_set.context_set.all())
+        return render(request, 'survey/step.html', {
+            'participant': participant,
+            'word': context_set.word,
+            'contexts': contexts,
+            'disabled': disabled,
+            'next_step': (step + 1) if step < last_step else None,
+        })
 
 
 def survey_feedback(request, participant_id):

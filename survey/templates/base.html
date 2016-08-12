@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <title>{% block title %}Опрос{% endblock %}</title>
     <link href='https://fonts.googleapis.com/css?family=Istok+Web:400,400italic,700italic,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="/static/survey/css/style.css">
-    <link rel="stylesheet" href="/static/survey/css/animation.css">
     <script src="/static/survey/js/jquery.js"></script>
-    <script src="/static/survey/js/script.js"></script>
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
 {% block content %}{% endblock %}

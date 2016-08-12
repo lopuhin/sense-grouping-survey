@@ -8,7 +8,7 @@ import survey.views
 
 urlpatterns = [
     url(r'^$', survey.views.Start.as_view(), name='start_survey'),
-    url(r'^group/([\w\-]+)/(\d+)/$', survey.views.survey_step,
+    url(r'^group/([\w\-]+)/(\d+)/$', survey.views.Step.as_view(),
         name='survey_step'),
     url(r'^feedback/([\w\-]+)/$', survey.views.survey_feedback,
         name='survey_feedback'),
