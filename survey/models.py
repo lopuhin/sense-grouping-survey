@@ -25,18 +25,14 @@ class Education(Named):
     pass
 
 
-class Speciality(Named):
-    pass
-
-
 class Participant(models.Model):
     """ Survey participant.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    speciality = models.ForeignKey(Speciality, verbose_name='Образование')
+    profession = models.TextField(verbose_name='Образование')
     age = models.PositiveIntegerField(verbose_name='Возраст')
     leading_hand = models.ForeignKey(LeadingHand, verbose_name='Ведущая рука')
-    sex = models.ForeignKey(Sex, verbose_name='Пол')
+    sex = models.BooleanField(verbose_name='Пол')
     languages = models.TextField(
         verbose_name='Родной язык/языки',
         help_text='пожалуйста, перечислите все')
@@ -66,8 +62,9 @@ class ContextSet(models.Model):
 
 
 class Context(models.Model):
-    text = models.TextField()
     context_set = models.ForeignKey(ContextSet)
+    order = models.FloatField()
+    text = models.TextField()
 
     class Meta:
         verbose_name = 'Контекст'

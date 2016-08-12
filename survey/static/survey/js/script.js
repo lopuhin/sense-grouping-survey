@@ -1,16 +1,17 @@
 var current_part = 1;
-var err = false
-$(document).ready(function(e){              
+
+$(document).ready(function(e){
   $(".submit").on('click', function(){
     check($(this))
   })
 })
 
-var check = function(this_button){ 
+var check = function(this_button){
   if(current_part==2){
     var form_id = this_button.parent()[0].id
-    var str = $('#'+form_id).serialize().split('_')
-    var inputs = $("#"+form_id).find('.input')
+    var $form = $('#' + form_id);
+    var inputs = $form.find('.input')
+    var err = false;
 
     inputs.each(function(){
       var val = $(this).val()
@@ -23,29 +24,29 @@ var check = function(this_button){
       }
     })
     if(err == false){
-      var age = $('[name = "_age"]').val()
-      console.log(age)
+      var age = $('[name = "age"]').val()
       if (age<17 || age>70) {
-        alert("в исследовании могут принимать участие лица от 16 до 70 лет")
+        alert("В исследовании могут принимать участие лица от 17 до 70 лет")
       }else{
-        send_ajax(str)
-        change_part()
+        send_ajax($form);
       }
     }
-  } 
+  }
   else{
     change_part()
   }
 }
 
-var send_ajax = function(str){
-  console.log(str)
-  /*$.ajax({
-    type: 'POST',
-    url: url,
-    data: str,
-    success: change_part();
-  });*/
+var send_ajax = function ($form) {
+  $.ajax({
+    url: '/',
+    method: 'POST',
+    data: $form.serialize(),
+    success: function (response) {
+      $('#next').attr('href', response.next);
+      change_part();
+    }
+  });
 
 }
 var change_part=function(){
@@ -54,3 +55,5 @@ $(".part"+current_part).removeClass('open')
   current_part++
   $(".part"+current_part).addClass('open')
 }
+
+

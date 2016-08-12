@@ -7,125 +7,146 @@
 - model: survey.context
   pk: 1
   fields:
+    order: 1
     context_set: 1
     text: спелый гранат
 
 - model: survey.context
   pk: 2
   fields:
+    order: 1
     context_set: 1
     text: вкусные гранаты
 
 - model: survey.context
   pk: 3
   fields:
+    order: 1
     context_set: 1
     text: почистить гранат
 
 - model: survey.context
   pk: 4
   fields:
+    order: 1
     context_set: 1
     text: съесть гранат
 
 - model: survey.context
   pk: 5
   fields:
+    order: 1
     context_set: 1
     text: посадить гранат
 
 - model: survey.context
   pk: 6
   fields:
+    order: 1
     context_set: 1
     text: цветущие гранаты
 
 - model: survey.context
   pk: 7
   fields:
+    order: 1
     context_set: 1
     text: Гранаты любят тепло
 
 - model: survey.context
   pk: 8
   fields:
+    order: 1
     context_set: 1
     text: В саду росли гранаты
 
 - model: survey.context
   pk: 9
   fields:
+    order: 1
     context_set: 1
     text: неограненный гранат
 
 - model: survey.context
   pk: 10
   fields:
+    order: 1
     context_set: 1
     text: добывать гранат
 
 - model: survey.context
   pk: 11
   fields:
+    order: 1
     context_set: 1
     text: месторождение граната
 
 - model: survey.context
   pk: 12
   fields:
+    order: 1
     context_set: 1
     text: ожерелье из граната
 
 - model: survey.contextset
   pk: 2
   fields:
+    order: 1
     word: каторга
     order: 2.0
 
 - model: survey.context
   pk: 13
   fields:
+    order: 1
     context_set: 2
     text: двадцать лет каторги
 
 - model: survey.context
   pk: 14
   fields:
+    order: 1
     context_set: 2
     text: отбывать каторгу
 
 - model: survey.context
   pk: 15
   fields:
+    order: 1
     context_set: 2
     text: приговорить к каторге
 
 - model: survey.context
   pk: 16
   fields:
+    order: 1
     context_set: 2
     text: сибирская каторга
 
 - model: survey.context
   pk: 17
   fields:
+    order: 1
     context_set: 2
     text: бежать с каторги
 
 - model: survey.context
   pk: 18
   fields:
+    order: 1
     context_set: 2
     text: Работа преподавателя – это каторга
 
 - model: survey.context
   pk: 19
   fields:
+    order: 1
     context_set: 2
     text: Стирка, готовка, уборка - устала уже от этой вечной каторги
 
 - model: survey.context
   pk: 20
   fields:
+    order: 1
     context_set: 2
     text: Не жизнь, а каторга

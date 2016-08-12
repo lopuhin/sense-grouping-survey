@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>анкета</title>
-  <link href='https://fonts.googleapis.com/css?family=Istok+Web:400,400italic,700italic,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/animation.css">
-  <script src="js/jquery.js"></script>
-  <script src="js/script.js"></script>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
 
   <div class="wrapper">
      <div class="part1 inline">
@@ -21,57 +11,37 @@
           <p>
             Нажимая на&#160;кнопку <i>Далее</i>, вы&#160;подтверждаете, что добровольно соглашаетесь на&#160;участие в&#160;исследовании, что вам от&#160;16&#160;до&#160;70&#160;лет, ваш родной язык&#160;&#8212; русский, и&#160;вы&#160;не&#160;страдаете от&#160;неврологических и&#160;психических заболеваний.
           </p>
-        <!--   <div>
-            <p class="input_radio"><input type="radio" name="prof" class="radio" id="r3" value="лингвист"><label for="r3">лингвист</label></p>
-            <p class="input_radio"><input type="radio" name="prof" class="radio" id="r4" value="филолог"><label for="r4">филолог</label></p>
-            <p class="input_radio"><input type="radio" name="prof" class="radio" id="r5" value="преподаватель русского языка как иностранного"><label for="r5">преподаватель русского языка как иностранного</label></p>
-            <p class="input_radio"><input type="radio" name="prof" class="radio" id="r6" value="преподаватель русского языка / литературы"><label for="r6">преподаватель русского языка / литературы</label></p>
-            <p class="input_radio"><input type="radio" name="prof" class="radio" id="r7" value="переводчик"><label for="r7">переводчик</label></p>
-            <p class="input_radio"><input type="radio" name="prof" class="radio" id="r8" value="ни одно из перечисленных"><label for="r8">ни одно из перечисленных</label></p>
-          </div> -->
           <div class="submit">Далее</div>
       </form>
     </div>
     <div class="part2 inline">
-      <form action="" id="part2" class="form">
+      <form action="" id="part2" class="form" method="POST">
+        {% csrf_token %}
         <p>Мы хотим узнать ещё немного о вас:</p>
         <div>
           <p class="title">Пол</p>
-          <p class="input_radio"><input type="radio" name="sex" class="radio" id="r1" value='мужчина' checked><label for="r1">мужчина</label></p>
-          <p class="input_radio"><input type="radio" name="sex" class="radio" id="r2" value='женщина'><label for="r2">женщина</label></p>
+          <p class="input_radio"><input type="radio" name="sex" class="radio" id="r1" value='0'><label for="r1">мужчина</label></p>
+          <p class="input_radio"><input type="radio" name="sex" class="radio" id="r2" value='1'><label for="r2">женщина</label></p>
         </div>
         <div>
           <p class="title">Возраст</p>
-          <input type="number" min="17" max="100" class="input" name="_age" placeholder="введите число от 17 до 70">
+          <input type="number" min="17" max="100" class="input" name="age" placeholder="введите число от 17 до 70">
         </div>
         <div>
           <p class="title">Ведущая рука</p>
-          <select class="input" name="_arm">
-            <option>правая</option>
-            <option>левая</option>
-            <option>переученный левша</option>
-            <option>владею обеими руками одинаково</option>
-          </select>
+            {{ form.leading_hand }}
         </div>
         <div>
           <p class="title">Родной язык/языки</p>
-          <input type="text" class="input" placeholder="пожалуйста, перечислите все" name="_language">
+          <input type="text" class="input" placeholder="пожалуйста, перечислите все" name="languages">
         </div>
         <div>
-          <p class="title">по специальности вы:</p>
-          <input type="text" class="input" name="_prof">
+          <p class="title">По специальности вы:</p>
+          <input type="text" class="input" name="profession">
         </div>
         <div>
           <p class="title">Последняя законченная ступень образования</p>
-           <select class="input" name="_status">
-            <option>средняя школа</option>
-            <option>школа</option>
-            <option>бакалавриат</option>
-            <option>магистратура</option>
-            <option>специалитет</option>
-            <option>аспирантура</option>
-            <option>докторантура</option>
-          </select>
+            {{ form.education }}
         </div>
         <div class="submit">Далее</div>
       </form>
@@ -84,11 +54,10 @@
         <p>
           Например, &#60;здесь нужен будет пример со&#160;скриншотами, когда будут скриншоты&#62;
         </p>
-        <div class="start"><a href="test.html">начать тест</a></div>
+        <div class="start"><a id="next" href="#">начать тест</a></div>
       </div>
     </div>
    
   </div>
- 
-</body>
-</html>
+
+{% endblock %}

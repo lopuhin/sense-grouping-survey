@@ -1,22 +1,30 @@
-import random
+import json
 
-from django.shortcuts import render, redirect, Http404
+from django.views import View
+from django.http import HttpResponseBadRequest
+from django.shortcuts import render, redirect, Http404, reverse, HttpResponse
 
 from .forms import ParticipantForm, FeedbackForm
 from .models import Participant, ContextSet, ContextGroup
 
 
-def start_survey(request):
-    if request.method == 'POST':
+class Start(View):
+    def get(self, request):
+        return render(request, 'survey/start.html', {
+            'form': ParticipantForm(),
+        })
+
+    def post(self, request):
+        result = {}
         form = ParticipantForm(request.POST)
         if form.is_valid():
             participant = form.save()
-            return redirect('survey_step', str(participant.id), 0)
-    else:
-        form = ParticipantForm()
-    return render(request, 'start_survey.html', {
-        'form': form,
-    })
+            result['next'] = reverse('survey_step', args=[str(participant.id), 0])
+            response_cls = HttpResponse
+        else:
+            response_cls = HttpResponseBadRequest
+            result['error'] = str(form.errors())
+        return response_cls(json.dumps(result), content_type='text/json')
 
 
 def survey_step(request, participant_id, step):
@@ -32,7 +40,6 @@ def survey_step(request, participant_id, step):
             .exists())
     last_step = ContextSet.objects.count() - 1
     contexts = list(context_set.context_set.all())
-    random.shuffle(contexts)
     return render(request, 'survey_step.html', {
         'participant': participant,
         'word': context_set.word,
