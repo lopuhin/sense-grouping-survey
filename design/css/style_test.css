@@ -1,0 +1,86 @@
+body{
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Istok Web', sans-serif!important;
+  font-size: 18px;
+  line-height: 28px;
+  /*background-color: #A9E2F3;*/
+  overflow-x: hidden;
+}
+span {
+  display: inherit;
+}
+.drag{
+  cursor: pointer;
+  display: table;
+  
+}
+.groups{
+  padding: 10px;
+  min-width: 150px;
+  min-height: 150px;
+  background-image: url(../iconbasket.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  display: inline-block;
+  border-radius: 50%;
+
+}
+.user_group{
+  padding: 50px;
+  min-width: 100px;
+  min-height: 100px;
+  margin: 20px;
+}
+.user_group .drag{
+  margin: 0 auto;
+  font-size: 15px;
+}
+.inline, #section, #groups, .user_group{
+  display: inline-block;
+  vertical-align: top;
+}
+#section{
+  background-color: white;
+  position: fixed;
+  width: 18%;
+  padding: 20px;
+  min-height: 100vh;
+    -webkit-box-shadow: 4px 4px 10px 1px rgba(0,0,0,0.35);
+  -moz-box-shadow:43px 4px 10px 1px rgba(0,0,0,0.35);
+  box-shadow: 4px 4px 10px 1px rgba(0,0,0,0.35);
+}
+#groups{
+  padding: 10px 10px 100px;
+  width: 77%;
+  margin-left: 22%;
+}
+.control_buttons{
+ position: fixed;
+  bottom: 0;
+  width: 77%;
+  margin-left: 22%;
+  text-align: center;
+  background-color: white;
+}
+.new_group, .next_group{
+  font-size: medium;
+  color: #fff;
+  background-color: #9FD468;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
+  margin: 10px 20px;
+  padding: 10px;
+  cursor: pointer;
+  width: 25%;
+  transition: all .2s;
+}
+.new_group p, .next_group p{
+  margin: 0;
+}
+.new_group:hover, .next_group:hover{
+  background-color: #7EBE3B;
+}

@@ -1,0 +1,120 @@
+body{
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Istok Web', sans-serif!important;
+  font-size: 18px;
+  line-height: 28px;
+  background-color: #A9E2F3;
+  overflow-x: hidden;
+}
+.wrapper{
+  width: 50%;
+  margin: 0 auto;
+}
+.inline{
+  position: absolute;
+  width: 50%;
+}
+.form{
+  padding: 15px 50px;
+  background-color: white;
+  -webkit-box-shadow: 4px 4px 10px 1px rgba(0,0,0,0.35);
+  -moz-box-shadow:43px 4px 10px 1px rgba(0,0,0,0.35);
+  box-shadow: 4px 4px 10px 1px rgba(0,0,0,0.35);
+}
+p{
+  margin-bottom: 10px;
+}
+div{
+  margin: 20px 0;
+}
+.input_radio{
+  margin-top:5px;
+}
+.part2, .part3{
+      transform: translate(100%,0px);
+      opacity: 0;
+}
+input, .input, label{
+  font-size: 15px;
+  font-family: 'Istok Web', sans-serif!important;
+}
+.input, select, textarea{
+   width: 70%;
+   border: none;
+   border: 1px solid rgba(255,0,0,0.4);
+   border-radius: 5px;
+   padding: 7px;
+}
+.title{
+  margin-bottom: 0px;
+  font-size: 15px;
+  font-weight: bold;
+}
+.radio + label {
+  cursor: pointer;
+}
+.radio:not(checked) {
+  position: absolute;
+  opacity: 0;
+}
+.radio:not(checked) + label {
+  position: relative;
+  padding: 0 0 0 40px;
+}
+.radio:not(checked) + label:before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 5px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(255,0,0,0.4);
+  border-radius: 50%;
+  background: #FFF;
+}
+.radio:not(checked) + label:after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 10px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #9FD468;
+  opacity: 0;
+  transition: all .2s;
+}
+.radio:checked + label:after {
+  opacity: 1;
+}
+.submit, .start{
+  color: #fff;
+  background-color: #9FD468;
+  border-radius: 6px;
+  border: none;
+  padding: 10px;
+  text-align: center;
+  margin: 30px auto;
+  cursor: pointer;
+  width: 50%;
+  transition: all .2s;
+}
+.submit:hover, .start:hover{
+  background-color: #7EBE3B;
+}
+.start a{
+   color: #fff;
+   text-decoration: none;
+}
+.mail_img{
+  text-align: center;
+  margin: 30px;
+}
+.mail_img img{
+  width: 50%;
+}
+
+
+

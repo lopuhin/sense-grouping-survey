@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <script src="js/jquery.js"></script>
+
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/script_test.js"></script>
+  <script src="js/randomColor.js"></script>
+
+  <link rel="stylesheet" href="css/style_test.css">
+
+</head>
+<body>
+<div id="section"  ondragenter="return dragEnter(event)" class="mess_group" 
+     ondrop="dragDrop1(event)" 
+     ondragover="return dragOver(event)">
+     <h1 class="title"></h1>
+        <p class="drag" id="mess_1" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_2" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_3" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_4" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_5" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_6" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_7" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_8" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_9" draggable="true" ondragstart="return dragStart(event)"></p>
+        <p class="drag" id="mess_10" draggable="true" ondragstart="return dragStart(event)"></p>
+        
+</div>
+<div id="groups">
+  <div class="groups">
+  <div name="text" id="group_1" class="user_group"  cols="30" rows="10" ondragenter="return dragEnter(event)"
+       ondrop="dragDrop1(event)"  
+       ondragover="return dragOver(event)">
+  </div>
+  </div>
+</div>
+<div class="control_buttons">
+    <div class="new_group inline">
+      <p>создать новую группу</p>
+    </div>
+    <div class="next_group inline">
+      <p>перейти к следующему вопросу</p>
+    </div>
+  </div>
+
+
+
+
+<script>
+var data;
+  function dragStart(ev) {
+   ev.dataTransfer.effectAllowed='move';
+   ev.dataTransfer.dropEffect='move';
+   ev.dataTransfer.setData("Text", ev.target.getAttribute('id'));
+   data = ev.target.getAttribute('id')
+   return true;
+}
+function dragEnter(ev) {
+   ev.preventDefault();
+   return true;
+}
+function dragOver(ev) {
+  ev.preventDefault();
+   return true;
+}
+
+function dragDrop1(ev) {
+   var class_name = ev.target.getAttribute('class')
+   switch(class_name){
+    case "user_group":
+    case "mess_group":
+      ev.target.appendChild(document.getElementById(data));
+      break
+    case "drag":
+     $('#'+ev.target.id).parent()[0].appendChild(document.getElementById(data))
+   }
+     circle_size(data)
+   ev.stopPropagation();
+   return false;
+ }
+function circle_size(id) {
+  var group = $('#' + id).parent()
+  var width = group.width()
+  var height = group.height()
+  if (width<height && group.hasClass('user_group')) {
+    group.css('width',height)
+  }
+}
+</script>
+</body>
+</html>
