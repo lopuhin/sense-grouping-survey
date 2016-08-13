@@ -86,3 +86,6 @@ class ContextGroup(models.Model):
     class Meta:
         verbose_name = 'Группировка контекстов'
         verbose_name_plural = 'Группировки контекстов'
+
+    def __str__(self):
+        return '{} {}'.format(self.context_set, self.participant)

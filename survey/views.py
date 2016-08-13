@@ -22,10 +22,7 @@ class Start(View):
             return json_response(
                 {'next': reverse('survey_step', args=[participant])})
         else:
-            # TODO - show it
-            return json_response(
-                {'error': str(form.errors())},
-                response_cls=HttpResponseBadRequest)
+            return invalid_form_response(form)
 
 
 class Group(View):
@@ -76,23 +73,27 @@ class Group(View):
         return json_response({})
 
 
-def survey_feedback(request, participant_id):
-    participant = Participant.objects.get(pk=participant_id)
-    if request.method == 'POST':
+class Feedback(View):
+    def get(self, request, participant_id):
+        participant = Participant.objects.get(pk=participant_id)
+        form = FeedbackForm(instance=participant)
+        return render(request, 'survey/feedback.html', {'form': form})
+
+    def post(self, request, participant_id):
+        participant = Participant.objects.get(pk=participant_id)
         form = FeedbackForm(request.POST, instance=participant)
         if form.is_valid():
             form.save()
-            return redirect('finish_survey')
-    else:
-        form = FeedbackForm(instance=participant)
-    return render(request, 'survey/feedback.html', {'form': form})
-
-
-def finish_survey(request):
-    return render(request, 'survery/finish.html')
+            return json_response({})
+        else:
+            return invalid_form_response(form)
 
 
 def json_response(data, response_cls=HttpResponse):
     return response_cls(json.dumps(data), content_type='text/json')
 
 
+def invalid_form_response(form):
+    # TODO - show it
+    return json_response(
+        {'error': str(form.errors())}, response_cls=HttpResponseBadRequest)

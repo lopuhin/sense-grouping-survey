@@ -1,19 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>анкета</title>
-  <link href='https://fonts.googleapis.com/css?family=Istok+Web:400,400italic,700italic,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/animation.css">
-  <script src="js/jquery.js"></script>
-  <script src="js/script.js"></script>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="/static/survey/css/form.css">
+    <link rel="stylesheet" href="/static/survey/css/animation.css">
+    <script src="/static/survey/js/form.js"></script>
+{% endblock %}
+
+{% block content %}
 
   <div class="wrapper">
     <div class="part1 inline">
-      <form id="part1" class="form">
+      <form id="part1" class="form feedback-form">
+        {% csrf_token %}
         <p>
           Спасибо за участие в нашем опросе! 
         </p>
@@ -22,11 +20,11 @@
         </p>
         <div>
           <p class="title">e-mail</p>
-          <input type="mail" class="input">
+          <input type="mail" class="input" name="email">
         </div>
         <div>
           <p class="title">Текст сообщения</p>
-          <textarea name="massage" id="" rows="10"></textarea> 
+          <textarea name="feedback" rows="10"></textarea>
         </div>
         <div class="submit">отправить</div>
       </form>
@@ -34,10 +32,10 @@
     <div class="part2 inline">
       <div id="part1" class="form">
         <p>
-          Ваше сообщения отправлено.
+          Ваше сообщения отправлено. Спасибо!
         </p>
         <div class="mail_img">
-          <img src="mail.png" alt="mail">
+          <img src="/static/survey/img/mail.png" alt="mail">
         </div>
         
       </div> 
@@ -45,6 +43,5 @@
     </div>
    
   </div>
- 
-</body>
-</html>
+
+{% endblock %}

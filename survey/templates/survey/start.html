@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="/static/survey/css/style.css">
+    <link rel="stylesheet" href="/static/survey/css/form.css">
     <link rel="stylesheet" href="/static/survey/css/animation.css">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="/static/survey/js/script.js"></script>
+    <script src="/static/survey/js/form.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -23,7 +22,7 @@
       </form>
     </div>
     <div class="part2 inline">
-      <form action="" id="part2" class="form" method="POST">
+      <form action="" id="part2" class="form start-form" method="POST">
         {% csrf_token %}
         <p>Мы хотим узнать ещё немного о вас:</p>
         <div>
