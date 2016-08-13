@@ -98,10 +98,11 @@ class Feedback(View):
 
 
 class Export(View):
-    def get(self, _):
+    def get(self, request):
         groups = {}  # participant_id -> context_set -> [{ctx}]
         n_context_sets = ContextSet.objects.count()
         named_contexts = get_named_contexts()
+        only_complete = 'all' not in request.GET
         for cs in ContextGroup.objects.prefetch_related('contexts'):
             (groups
              .setdefault(cs.participant_id, {})
@@ -116,7 +117,7 @@ class Export(View):
             with zipfile.ZipFile(archive_path, 'w') as archive:
                 participants = set()
                 for participant_id, p_groups in groups.items():
-                    if len(p_groups) != n_context_sets:
+                    if only_complete and len(p_groups) != n_context_sets:
                         continue  # not all grouped
                     participants.add(participant_id)
                     with saving_book(archive, dirname, folder_name,
