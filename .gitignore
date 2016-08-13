@@ -2,4 +2,3 @@
 *.egg-info
 venv
 *.sqlite3
-static/
