@@ -126,6 +126,9 @@ class Export(View):
                 with saving_book(
                         archive, dirname, folder_name, '_participants') as book:
                     write_participants(book, participants)
+                with saving_book(
+                        archive, dirname, folder_name, '_contexts') as book:
+                    write_contexts(book, named_contexts)
             with open(archive_path, 'rb') as f:
                 response = HttpResponse(
                     f.read(), content_type='application/vnd.openxmlformats-'
@@ -210,6 +213,20 @@ def write_participants(book: xlsxwriter.Workbook, participants: Set[int]):
                 if not isinstance(value, int):
                     value = str(value or '')
                 sheet.write(row, col, value)
+
+
+def write_contexts(book: xlsxwriter.Workbook, named_contexts):
+    sheet = book.add_worksheet()
+    sheet.write(0, 0, 'id')
+    sheet.write(0, 1, 'word')
+    sheet.write(0, 2, 'context')
+    data = [(named_contexts[ctx.id].idx,
+             [named_contexts[ctx.id].name, ctx.context_set.word, ctx.text])
+            for ctx in Context.objects.select_related('context_set')]
+    data.sort()
+    for idx, row in data:
+        for col, val in enumerate(row):
+            sheet.write(idx + 1, col, val)
 
 
 @contextlib.contextmanager
