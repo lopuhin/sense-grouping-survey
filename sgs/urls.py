@@ -12,6 +12,8 @@ urlpatterns = [
         name='survey_step'),
     url(r'^feedback/([\w\-]+)/$', survey.views.Feedback.as_view(),
         name='survey_feedback'),
+    url(r'^export/$', survey.views.Export.as_view(),
+        name='survey_export'),
     url(r'^admin/', admin.site.urls),
     url(r'^static/(?P<path>.*)$', static.serve,
         {'document_root': settings.STATIC_ROOT,

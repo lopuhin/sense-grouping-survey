@@ -1,2 +1,5 @@
+attrs=16
 Django==1.10
 PyYAML==3.11
+XlsxWriter==0.9.3
+pytz==2016.6.1

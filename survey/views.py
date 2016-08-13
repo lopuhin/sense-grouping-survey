@@ -1,12 +1,19 @@
 import json
+import os.path
 import random
+import tempfile
+from typing import Dict, Tuple
+import zipfile
 
-from django.views import View
+import attr
 from django.http import HttpResponseBadRequest
-from django.shortcuts import render, redirect, Http404, reverse, HttpResponse
+from django.shortcuts import render, redirect, reverse, HttpResponse
+from django.utils import timezone
+from django.views import View
+import xlsxwriter
 
 from .forms import ParticipantForm, FeedbackForm
-from .models import Participant, ContextGroup, Context
+from .models import Participant, ContextGroup, Context, ContextSet
 
 
 class Start(View):
@@ -87,6 +94,81 @@ class Feedback(View):
             return json_response({})
         else:
             return invalid_form_response(form)
+
+
+class Export(View):
+    def get(self, _):
+        groups = {}  # participant_id -> context_set -> [{ctx}]
+        n_context_sets = ContextSet.objects.count()
+        named_contexts = get_named_contexts()
+        for cs in ContextGroup.objects.prefetch_related('contexts'):
+            (groups
+             .setdefault(cs.participant_id, {})
+             .setdefault(cs.context_set_id, [])
+             .append({ctx.id for ctx in cs.contexts.all()})
+             )
+        with tempfile.TemporaryDirectory() as dirname:
+            folder_name = 'SGS_Survey_{}'.format(
+                timezone.now().strftime('%Y-%m-%d__%H_%M_%S'))
+            archive_name = '{}.zip'.format(folder_name)
+            archive_path = os.path.join(dirname, archive_name)
+            with zipfile.ZipFile(archive_path, 'w') as archive:
+                for participant_id, p_groups in groups.items():
+                    if len(p_groups) != n_context_sets:
+                        continue  # not all grouped
+                    filename = '{}.xlsx'.format(participant_id)
+                    full_path = os.path.join(dirname, filename)
+                    with xlsxwriter.Workbook(full_path) as book:
+                        write_participant(book, named_contexts, p_groups)
+                    archive.write(
+                        full_path, arcname='{}/{}'.format(folder_name, filename))
+            with open(archive_path, 'rb') as f:
+                response = HttpResponse(
+                    f.read(), content_type='application/vnd.openxmlformats-'
+                                           'officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = \
+                    'attachment; filename="{}"'.format(archive_name)
+                return response
+
+
+@attr.s
+class NamedContext:
+    idx = attr.ib()
+    name = attr.ib()
+
+
+def get_named_contexts() -> Dict[int, NamedContext]:
+    named_contexts = {}
+    cs_n = ctx_n = 1
+    prev_cs = None
+    for idx, ctx in enumerate(
+            Context.objects.order_by('context_set__id', 'order')):
+        named_contexts[ctx.id] = NamedContext(
+            idx=idx, name='set{}_stim{}'.format(cs_n, ctx_n))
+        if prev_cs is not None and ctx.context_set_id != prev_cs:
+            cs_n += 1
+            ctx_n = 1
+        else:
+            ctx_n += 1
+        prev_cs = ctx.context_set_id
+    return named_contexts
+
+
+def write_participant(book, named_contexts, p_groups):
+    sheet = book.add_worksheet()
+    # write header
+    for named in sorted(
+            named_contexts.values(), key=lambda x: x.idx):
+        sheet.write(named.idx, 0, named.name)
+        sheet.write(0, named.idx, named.name)
+    # write cells
+    for cs_groups in p_groups.values():
+        for group in cs_groups:
+            for a, b in ((a, b) for a in group for b in group):
+                idx1, idx2 = (named_contexts[a].idx,
+                              named_contexts[b].idx)
+                if idx1 > idx2:
+                    sheet.write(idx1 + 1, idx2 + 1, 1)
 
 
 def json_response(data, response_cls=HttpResponse):
