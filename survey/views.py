@@ -1,8 +1,9 @@
+import contextlib
 import json
 import os.path
 import random
 import tempfile
-from typing import Dict, Tuple
+from typing import Dict, Set
 import zipfile
 
 import attr
@@ -113,15 +114,17 @@ class Export(View):
             archive_name = '{}.zip'.format(folder_name)
             archive_path = os.path.join(dirname, archive_name)
             with zipfile.ZipFile(archive_path, 'w') as archive:
+                participants = set()
                 for participant_id, p_groups in groups.items():
                     if len(p_groups) != n_context_sets:
                         continue  # not all grouped
-                    filename = '{}.xlsx'.format(participant_id)
-                    full_path = os.path.join(dirname, filename)
-                    with xlsxwriter.Workbook(full_path) as book:
-                        write_participant(book, named_contexts, p_groups)
-                    archive.write(
-                        full_path, arcname='{}/{}'.format(folder_name, filename))
+                    participants.add(participant_id)
+                    with saving_book(archive, dirname, folder_name,
+                                     name=participant_id) as book:
+                        write_p_groups(book, named_contexts, p_groups)
+                with saving_book(
+                        archive, dirname, folder_name, '_participants') as book:
+                    write_participants(book, participants)
             with open(archive_path, 'rb') as f:
                 response = HttpResponse(
                     f.read(), content_type='application/vnd.openxmlformats-'
@@ -154,7 +157,7 @@ def get_named_contexts() -> Dict[int, NamedContext]:
     return named_contexts
 
 
-def write_participant(book, named_contexts, p_groups):
+def write_p_groups(book: xlsxwriter.Workbook, named_contexts, p_groups):
     sheet = book.add_worksheet()
     # write header
     for named in sorted(
@@ -169,6 +172,35 @@ def write_participant(book, named_contexts, p_groups):
                               named_contexts[b].idx)
                 if idx1 > idx2:
                     sheet.write(idx1 + 1, idx2 + 1, 1)
+
+
+def write_participants(book: xlsxwriter.Workbook, participants: Set[int]):
+    sheet = book.add_worksheet()
+    fields = ['id', 'profession', 'age', 'leading_hand',
+              'sex', 'languages', 'education', 'email', 'feedback']
+    for col, field in enumerate(fields):
+        sheet.write(0, col, field)
+    row = 0
+    for p in Participant.objects.select_related('leading_hand', 'education'):
+        if p.id in participants:
+            row += 1
+            for col, field in enumerate(fields):
+                value = getattr(p, field)
+                if field == 'sex':
+                    value = ['male', 'female'][int(value)]
+                if not isinstance(value, int):
+                    value = str(value)
+                sheet.write(row, col, value)
+
+
+@contextlib.contextmanager
+def saving_book(archive: zipfile.ZipFile, dirname, folder_name, name):
+    filename = '{}.xlsx'.format(name)
+    full_path = os.path.join(dirname, filename)
+    with xlsxwriter.Workbook(full_path) as book:
+        yield book
+    archive.write(
+        full_path, arcname='{}/{}'.format(folder_name, filename))
 
 
 def json_response(data, response_cls=HttpResponse):
