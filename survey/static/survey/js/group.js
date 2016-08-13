@@ -39,7 +39,7 @@ function create_group() {
   } else {
       number_groups += 1;
       var color = generate();
-      $("#groups").append(
+      $("#groups").prepend(
           '<div class="groups" style="background-color:' +
           color + '">' +
           '<div id="group_' + number_groups +
