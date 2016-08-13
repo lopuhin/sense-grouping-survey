@@ -42,10 +42,10 @@ function create_group() {
       $("#groups").append(
           '<div class="groups" style="background-color:' +
           color + '">' +
-          '<div name="text" id="group_' + number_groups +
+          '<div id="group_' + number_groups +
           '" class="user_group"  cols="30" rows="10" ' +
           'ondragenter="return dragEnter(event)" ' +
-          'ondrop="dragDrop(event)" ' +
+          'ondrop="ctxDragDrop(event)" ' +
           'ondragover="return dragOver(event)">' +
           '</div></div>');
     }
@@ -97,7 +97,7 @@ function dragOver(ev) {
     return true;
 }
 
-function dragDrop(ev) {
+function ctxDragDrop(ev) {
     var $target = $(ev.target);
     if ($target.hasClass('user_group') || $target.hasClass('mess_group')) {
         ev.target.appendChild(document.getElementById(dragged_id));
