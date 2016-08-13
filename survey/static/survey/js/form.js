@@ -59,6 +59,7 @@ function next_part() {
     $current.removeClass('open').addClass('hide');
     $next.addClass('open');
     current_part += 1;
+    window.scrollTo(0, 0);
 }
 
 
