@@ -65,7 +65,6 @@ function next_group() {
             }
             grouping[group_id].push(el.id.split('_')[1]);
         });
-        console.log(grouping);
         $.ajax({
             type: 'POST',
             url: './',

@@ -1,7 +1,7 @@
 var current_part = 1;
 
-$(document).ready(function(e){
-    $(".submit").on('click', function(){
+$(document).ready(function(){
+    $('.submit').on('click', function () {
         var $form = $(this).closest('form');
         if ($form.hasClass('start-form')) {
             submit_start_form($form);
@@ -10,7 +10,10 @@ $(document).ready(function(e){
         } else {
             next_part();
         }
-    })
+    });
+    $('div.link').on('click', function () {
+        window.location = $(this).find('a').attr('href');
+    });
 });
 
 function submit_start_form($form) {
