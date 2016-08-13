@@ -44,7 +44,7 @@ class Group(View):
         to_group = list(to_group.values())
         random.shuffle(to_group)
         if not to_group:
-            return redirect('survery_feedback', participant)
+            return redirect('survey_feedback', participant)
         return render(request, 'survey/group.html', {
             'participant': participant,
             'to_group': json.dumps(to_group),
