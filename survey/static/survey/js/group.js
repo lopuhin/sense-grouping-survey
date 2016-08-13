@@ -22,6 +22,7 @@ function push_words() {
     number_groups = 0;
     $('#groups').children().remove();
     create_group();
+    $('.next_group').addClass('disabled');
     $parent.append('<h1 class="title">' + group.word + '</h1>');
     for (var i = 0; i < group.contexts.length; i++) {
         var context = group.contexts[i];
