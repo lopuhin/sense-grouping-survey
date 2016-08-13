@@ -3,7 +3,7 @@ import json
 import os.path
 import random
 import tempfile
-from typing import Dict, Set
+from typing import Dict, Set, Tuple, List, Iterable, TypeVar
 import zipfile
 
 import attr
@@ -142,17 +142,17 @@ class NamedContext:
 
 def get_named_contexts() -> Dict[int, NamedContext]:
     named_contexts = {}
-    cs_n = ctx_n = 1
+    cs_n = ctx_n = 0
     prev_cs = None
     for idx, ctx in enumerate(
             Context.objects.order_by('context_set__id', 'order')):
-        named_contexts[ctx.id] = NamedContext(
-            idx=idx, name='set{}_stim{}'.format(cs_n, ctx_n))
-        if prev_cs is not None and ctx.context_set_id != prev_cs:
+        if prev_cs is None or ctx.context_set_id != prev_cs:
             cs_n += 1
             ctx_n = 1
         else:
             ctx_n += 1
+        named_contexts[ctx.id] = NamedContext(
+            idx=idx, name='set{}_stim{}'.format(cs_n, ctx_n))
         prev_cs = ctx.context_set_id
     return named_contexts
 
@@ -162,16 +162,34 @@ def write_p_groups(book: xlsxwriter.Workbook, named_contexts, p_groups):
     # write header
     for named in sorted(
             named_contexts.values(), key=lambda x: x.idx):
-        sheet.write(named.idx, 0, named.name)
-        sheet.write(0, named.idx, named.name)
+        sheet.write(named.idx + 1, 0, named.name)
+        sheet.write(0, named.idx + 1, named.name)
+
+    def indices(x, y):
+        return named_contexts[x].idx + 1, named_contexts[y].idx + 1
+
     # write cells
     for cs_groups in p_groups.values():
+        all_ids = set()
+        written = set()  # type: Set[Tuple[int, int]]
         for group in cs_groups:
-            for a, b in ((a, b) for a in group for b in group):
-                idx1, idx2 = (named_contexts[a].idx,
-                              named_contexts[b].idx)
-                if idx1 > idx2:
-                    sheet.write(idx1 + 1, idx2 + 1, 1)
+            all_ids.update(group)
+            for a, b in power(group):
+                idx1, idx2 = indices(a, b)
+                if idx1 >= idx2:
+                    sheet.write(idx1, idx2, 1)
+                    written.add((a, b))
+            for a, b in power(all_ids):
+                idx1, idx2 = indices(a, b)
+                if idx1 > idx2 and (a, b) not in written:
+                    sheet.write(idx1, idx2, 0)
+
+
+T = TypeVar('T')
+
+
+def power(lst: List[T]) -> Iterable[Tuple[T, T]]:
+    return ((a, b) for a in lst for b in lst)
 
 
 def write_participants(book: xlsxwriter.Workbook, participants: Set[int]):
@@ -189,7 +207,7 @@ def write_participants(book: xlsxwriter.Workbook, participants: Set[int]):
                 if field == 'sex':
                     value = ['male', 'female'][int(value)]
                 if not isinstance(value, int):
-                    value = str(value)
+                    value = str(value or '')
                 sheet.write(row, col, value)
 
 
