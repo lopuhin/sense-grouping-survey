@@ -29,6 +29,8 @@ class Participant(models.Model):
     """ Survey participant.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    started = models.DateTimeField(auto_now_add=True)
+    finished = models.DateTimeField(auto_now=True)
     profession = models.TextField(verbose_name='Образование')
     age = models.PositiveIntegerField(verbose_name='Возраст')
     leading_hand = models.ForeignKey(LeadingHand, verbose_name='Ведущая рука')
@@ -44,6 +46,7 @@ class Participant(models.Model):
     class Meta:
         verbose_name = 'Испытуемый'
         verbose_name_plural = 'Испытуемые'
+        ordering = ['finished']
 
     def __str__(self):
         return str(self.id)

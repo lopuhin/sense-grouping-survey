@@ -194,7 +194,7 @@ def power(lst: List[T]) -> Iterable[Tuple[T, T]]:
 
 def write_participants(book: xlsxwriter.Workbook, participants: Set[int]):
     sheet = book.add_worksheet()
-    fields = ['id', 'profession', 'age', 'leading_hand',
+    fields = ['id', 'started', 'finished', 'profession', 'age', 'leading_hand',
               'sex', 'languages', 'education', 'email', 'feedback']
     for col, field in enumerate(fields):
         sheet.write(0, col, field)
