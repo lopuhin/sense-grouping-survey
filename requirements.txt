@@ -1,4 +1,4 @@
-attrs=16
+attrs==16
 Django==1.10
 PyYAML==3.11
 pytz==2016.6.1
