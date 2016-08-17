@@ -1,4 +1,5 @@
 import contextlib
+import csv
 import json
 import os.path
 import random
@@ -11,7 +12,6 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, reverse, HttpResponse
 from django.utils import timezone
 from django.views import View
-import xlsxwriter
 
 from .forms import ParticipantForm, FeedbackForm
 from .models import Participant, ContextGroup, Context, ContextSet
@@ -119,19 +119,19 @@ class Export(View):
             archive_path = os.path.join(dirname, archive_name)
             with zipfile.ZipFile(archive_path, 'w') as archive:
                 participants = set()
+                write_csv = lambda sheet, name: _write_csv(
+                    sheet, archive, dirname, folder_name, name=name)
                 for participant_id, p_groups in groups.items():
                     if only_complete and len(p_groups) != n_context_sets:
                         continue  # not all grouped
                     participants.add(participant_id)
-                    with saving_book(archive, dirname, folder_name,
-                                     name=participant_id) as book:
-                        write_p_groups(book, named_contexts, p_groups)
-                with saving_book(
-                        archive, dirname, folder_name, '_participants') as book:
-                    write_participants(book, participants)
-                with saving_book(
-                        archive, dirname, folder_name, '_contexts') as book:
-                    write_contexts(book, named_contexts)
+                    write_csv(
+                        p_groups_sheet(named_contexts, p_groups),
+                        name=participant_id)
+                write_csv(
+                    participants_sheet(participants), name='_participants')
+                write_csv(
+                    contexts_sheet(named_contexts), name='_contexts')
             with open(archive_path, 'rb') as f:
                 response = HttpResponse(
                     f.read(), content_type='application/vnd.openxmlformats-'
@@ -164,8 +164,24 @@ def get_named_contexts() -> Dict[int, NamedContext]:
     return named_contexts
 
 
-def write_p_groups(book: xlsxwriter.Workbook, named_contexts, p_groups):
-    sheet = book.add_worksheet()
+class Sheet:
+    def __init__(self):
+        self.data = {}
+
+    def write(self, row, col, value):
+        self.data[row, col] = value
+
+    def write_csv(self, f):
+        writer = csv.writer(f)
+        n_cols = max(col for _, col in self.data)
+        n_rows = max(row for row, _ in self.data)
+        for row in range(n_rows + 1):
+            writer.writerow([
+                self.data.get((row, col), '') for col in range(n_cols + 1)])
+
+
+def p_groups_sheet(named_contexts, p_groups) -> Sheet:
+    sheet = Sheet()
     # write header
     for named in sorted(
             named_contexts.values(), key=lambda x: x.idx):
@@ -191,6 +207,8 @@ def write_p_groups(book: xlsxwriter.Workbook, named_contexts, p_groups):
                 if idx1 > idx2 and (a, b) not in written:
                     sheet.write(idx1, idx2, 0)
 
+    return sheet
+
 
 T = TypeVar('T')
 
@@ -199,8 +217,8 @@ def power(lst: List[T]) -> Iterable[Tuple[T, T]]:
     return ((a, b) for a in lst for b in lst)
 
 
-def write_participants(book: xlsxwriter.Workbook, participants: Set[int]):
-    sheet = book.add_worksheet()
+def participants_sheet(participants: Set[int]) -> Sheet:
+    sheet = Sheet()
     fields = ['id', 'started', 'finished', 'profession', 'age', 'leading_hand',
               'sex', 'languages', 'education', 'email', 'feedback']
     for col, field in enumerate(fields):
@@ -216,10 +234,11 @@ def write_participants(book: xlsxwriter.Workbook, participants: Set[int]):
                 if not isinstance(value, int):
                     value = str(value or '')
                 sheet.write(row, col, value)
+    return sheet
 
 
-def write_contexts(book: xlsxwriter.Workbook, named_contexts):
-    sheet = book.add_worksheet()
+def contexts_sheet(named_contexts):
+    sheet = Sheet()
     sheet.write(0, 0, 'id')
     sheet.write(0, 1, 'word')
     sheet.write(0, 2, 'context')
@@ -230,14 +249,15 @@ def write_contexts(book: xlsxwriter.Workbook, named_contexts):
     for idx, row in data:
         for col, val in enumerate(row):
             sheet.write(idx + 1, col, val)
+    return sheet
 
 
-@contextlib.contextmanager
-def saving_book(archive: zipfile.ZipFile, dirname, folder_name, name):
-    filename = '{}.xlsx'.format(name)
+def _write_csv(
+        sheet: Sheet, archive: zipfile.ZipFile, dirname, folder_name, name):
+    filename = '{}.csv'.format(name)
     full_path = os.path.join(dirname, filename)
-    with xlsxwriter.Workbook(full_path) as book:
-        yield book
+    with open(full_path, 'wt') as f:
+        sheet.write_csv(f)
     archive.write(
         full_path, arcname='{}/{}'.format(folder_name, filename))
 
