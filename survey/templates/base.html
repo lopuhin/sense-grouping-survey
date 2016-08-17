@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <title>{% block title %}Опрос{% endblock %}</title>
     <link href='https://fonts.googleapis.com/css?family=Istok+Web:400,400italic,700italic,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
-    <script src="/static/survey/js/jquery-3.1.0.js"></script>
-    {% if DEBUG %}
+    <!--
         <script src="/static/survey/js/jquery-3.1.0.js"></script>
-    {% else %}
-        <script src="https://code.jquery.com/jquery-3.1.0.min.js"
-                integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
-                crossorigin="anonymous"></script>
-    {% endif %}
+    -->
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"
+            integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
+            crossorigin="anonymous"></script>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
