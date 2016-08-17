@@ -45,7 +45,7 @@ function create_group() {
           '<div id="group_' + number_groups +
           '" class="user_group"  cols="30" rows="10" ' +
           'ondragenter="return dragEnter(event)" ' +
-          'ondrop="ctxDragDrop(event)" ' +
+          'ondrop="return ctxDragDrop(event)" ' +
           'ondragover="return dragOver(event)">' +
           '</div></div>');
     }
