@@ -80,8 +80,8 @@ function next_group() {
 var dragged_id;
 
 function dragStart(ev) {
-    ev.dataTransfer.effectAllowed='move';
-    ev.dataTransfer.dropEffect='move';
+    ev.dataTransfer.effectAllowed = 'move';
+    ev.dataTransfer.dropEffect = 'move';
     ev.dataTransfer.setData('Text', ev.target.getAttribute('id'));
     dragged_id = ev.target.getAttribute('id');
     return true;
