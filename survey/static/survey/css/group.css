@@ -88,3 +88,8 @@ span {
   background-color: lightgray;
   cursor: not-allowed;
 }
+.progress {
+  font-size: small;
+  position: absolute;
+  top: 1em;
+}

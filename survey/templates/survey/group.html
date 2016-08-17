@@ -6,6 +6,8 @@
     <script src="/static/survey/js/randomColor.js"></script>
     <script>
     var to_group = {{ to_group|safe }};
+    var done_contexts = {{ done_contexts }};
+    var total_to_group = {{ total_to_group }};
     var feedback_url = "{%  url "survey_feedback" participant %}";
     </script>
 {% endblock %}

@@ -53,9 +53,12 @@ class Group(View):
         random.shuffle(to_group)
         if not to_group:
             return redirect('survey_feedback', participant)
+        total_to_group = ContextSet.objects.count()
         return render(request, 'survey/group.html', {
             'participant': participant,
             'to_group': json.dumps(to_group),
+            'total_to_group': total_to_group,
+            'done_contexts': total_to_group - len(to_group),
         })
 
     def post(self, request, participant_id):

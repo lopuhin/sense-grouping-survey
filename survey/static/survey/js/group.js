@@ -23,6 +23,8 @@ function push_words() {
     $('#groups').children().remove();
     create_group();
     $('.next_group').addClass('disabled');
+    var progressMessage = (done_contexts + 1) + ' из ' + total_to_group;
+    $parent.append('<div class="progress">' + progressMessage + '</div>');
     $parent.append('<h1 class="title">' + group.word + '</h1>');
     for (var i = 0; i < group.contexts.length; i++) {
         var context = group.contexts[i];
@@ -72,7 +74,10 @@ function next_group() {
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                 grouping: JSON.stringify(grouping)
             },
-            success: push_words
+            success: function () {
+                done_contexts += 1;
+                push_words();
+            }
         });
     }
 }
