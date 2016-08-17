@@ -20,21 +20,21 @@
         </p>
         <div>
           <p class="title">e-mail</p>
-          <input type="mail" class="input" name="email">
+          <input type="mail" class="input" name="email" value="{{ form.initial.email }}">
         </div>
         <div>
           <p class="title">Текст сообщения</p>
-          <textarea name="feedback" rows="10"></textarea>
+          <textarea name="feedback" rows="10">{{ form.initial.feedback }}</textarea>
         </div>
         <div class="submit">отправить</div>
       </form>
     </div>
     <div class="part2 inline">
       <div id="part1" class="form">
-        <p>
+        <p id="success-message">
           Ваше сообщения отправлено. Спасибо!
         </p>
-        <div class="mail_img">
+        <div id="success-image" class="mail_img">
           <img src="/static/survey/img/mail.png" alt="mail">
         </div>
         

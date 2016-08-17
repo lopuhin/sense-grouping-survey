@@ -6,7 +6,7 @@ $(document).ready(function(){
         if ($form.hasClass('start-form')) {
             submit_start_form($form);
         } else if ($form.hasClass('feedback-form')) {
-            send_ajax($form);
+            submit_feedback_form($form);
         } else {
             next_part();
         }
@@ -34,6 +34,18 @@ function submit_start_form($form) {
     if (age < 17 || age > 70) {
         alert('В исследовании могут принимать участие лица от 17 до 70 лет');
         return;
+    }
+    send_ajax($form);
+}
+
+function submit_feedback_form($form) {
+    var hasMessage = Boolean($form.find('textarea[name=feedback]').val().trim());
+    var hasEmail = Boolean($form.find('input[name=email]').val().trim());
+    if (!hasMessage && !hasEmail) {
+        $('#success-image').hide();
+        $('#success-message').text('Спасибо за участие в опросе!');
+    } else if (!hasMessage) {
+        $('#success-message').text('Мы получили ваш адрес почты. Спасибо!');
     }
     send_ajax($form);
 }
