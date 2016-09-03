@@ -36,7 +36,10 @@ $(document).ready(function(){
     next_group();
   })
    push_words();
-   var color = generate()
+   var color = randomColor({
+        luminosity: 'light',
+        format: 'rgba'
+      })
    $('.groups').css('background-color',color)
 }); 
   
@@ -51,7 +54,10 @@ var create_group=function(){
   if (number_groups>=10 || $("#section > p").length==0) {alert('максимальное количество групп созданно')}
     else{
       number_groups++;
-      var color = generate()
+      var color = randomColor({
+        luminosity: 'light',
+        format: 'rgba' 
+      })
       $("#groups").append('<div class="groups" style="background-color:'+color+'"><div name="text" id="group_'+number_groups+'" class="user_group"  cols="30" rows="10" ondragenter="return dragEnter(event)" ondrop="dragDrop1(event)" ondragover="return dragOver(event)"></div></div>')
       
     }

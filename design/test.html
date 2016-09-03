@@ -85,9 +85,11 @@ function circle_size(id) {
   var group = $('#' + id).parent()
   var width = group.width()
   var height = group.height()
+  
   if (width<height && group.hasClass('user_group')) {
     group.css('width',height)
   }
+  
 }
 </script>
 </body>
