@@ -40,7 +40,10 @@ function create_group() {
       alert('максимальное количество групп созданно')
   } else {
       number_groups += 1;
-      var color = generate();
+      var color = randomColor({
+         luminosity: 'light',
+         format: 'rgba'
+      });
       $("#groups").prepend(
           '<div class="groups" style="background-color:' +
           color + '">' +
