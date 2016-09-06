@@ -120,11 +120,17 @@ function ctxDragDrop(ev) {
 
 function set_circle_size(id) {
     var group = $('#' + id).parent();
+    var k = group.parent();
     var width = group.width();
     var height = group.height();
-    if (width < height && group.hasClass('user_group')) {
-        group.css('width',height)
+    if (width < height) {
+        k.css('width', height + 20);
     }
+    if (width > height) {
+        k.css('height', width + 30);
+    }
+    group.css('height', k.height());
+    group.css('top', '30px');
 }
 
 function set_next_button_state() {
