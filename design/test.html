@@ -83,13 +83,22 @@ function dragDrop1(ev) {
  }
 function circle_size(id) {
   var group = $('#' + id).parent()
+  var k = group.parent()
+  console.log(k)
   var width = group.width()
   var height = group.height()
-  
-  if (width<height && group.hasClass('user_group')) {
-    group.css('width',height)
+ 
+  if (width<height) {
+    k.css('width',height+20)
   }
-  
+  if (width>height) {
+    k.css('height',width+30)
+  }
+     var height = k.height()
+   console.log(width, height)
+   group.css('height', height)
+   group.css('top', '30px')
+
 }
 </script>
 </body>
