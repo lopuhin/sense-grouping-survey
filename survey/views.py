@@ -45,7 +45,7 @@ class Group(View):
             if cs.id not in grouped:
                 cs_dict = to_group.setdefault(cs.id, {
                     'id': cs.id,
-                    'word': cs.word,
+                    'word': capitalize_first(cs.word),
                     'contexts': []})
                 cs_dict['contexts'].append(
                     {'id': context.id, 'text': context.text})
@@ -82,6 +82,10 @@ class Group(View):
                     context_set=context_set)
                 context_group.contexts.add(*group_contexts)
         return json_response({})
+
+
+def capitalize_first(word):
+    return word[0].upper() + word[1:]
 
 
 class Feedback(View):
