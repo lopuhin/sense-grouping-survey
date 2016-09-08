@@ -17,25 +17,27 @@ span {
   
 }
 .groups{
-  padding: 10px;
+  margin: 20px;
   min-width: 150px;
   min-height: 150px;
-  background-image: url("/static/survey/img/iconbasket.svg");
-  background-position: center;
-  background-size: contain;
   display: inline-block;
-  border-radius: 50%;
-
+  border-style: solid;
+  border-width: 60px 20px 22px 20px;
+  border-image: url(/static/survey/img/jar.png) 240 90 110 90 stretch;
+  /* if border-image does not work, this will show: */
+  border-color: rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
 }
 .user_group{
-  padding: 110px 50px 15px;
-  min-width: 100px;
-  min-height: 100px;
-  margin: 30px;
+  min-width: 150px;
+  min-height: 150px;
+  max-width: 200px;
+  text-align: center;
 }
 .user_group .drag{
-  margin: 0 auto;
+  margin: 15px auto;
   font-size: 15px;
+  line-height: 15px;
 }
 .inline, #section, #groups, .user_group{
   display: inline-block;
