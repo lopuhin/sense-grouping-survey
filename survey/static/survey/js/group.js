@@ -112,19 +112,9 @@ function ctxDragDrop(ev) {
     } else if ($target.hasClass('drag')) {
         $target.parent()[0].appendChild(document.getElementById(dragged_id));
     }
-    set_circle_size(dragged_id);
     set_next_button_state();
     ev.stopPropagation();
     return false;
-}
-
-function set_circle_size(id) {
-    var group = $('#' + id).parent();
-    var width = group.width();
-    var height = group.height();
-    if (width < height && group.hasClass('user_group')) {
-        group.css('width',height)
-    }
 }
 
 function set_next_button_state() {
