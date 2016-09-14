@@ -22,7 +22,7 @@ span {
   min-height: 150px;
   background-image: url("/static/survey/img/iconbasket.svg");
   background-position: center;
-  background-size: contain;
+  background-size: cover;
   display: inline-block;
   border-radius: 50%;
 
@@ -32,10 +32,13 @@ span {
   min-width: 100px;
   min-height: 100px;
   margin: 30px;
+  max-width: 180px;
+  text-align: center;
 }
 .user_group .drag{
-  margin: 0 auto;
+  margin: 10px auto;
   font-size: 15px;
+  line-height: 15px;
 }
 .inline, #section, #groups, .user_group{
   display: inline-block;
