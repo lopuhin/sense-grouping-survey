@@ -37,7 +37,7 @@ function push_words() {
 
 function create_group() {
   if (number_groups >= max_groups) {
-      alert('максимальное количество групп созданно')
+      alert('Максимальное количество групп создано.')
   } else {
       number_groups += 1;
       var color = randomColor({
