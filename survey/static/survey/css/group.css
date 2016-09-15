@@ -16,28 +16,33 @@ span {
   display: table;
   
 }
-.groups{
-  padding: 10px;
-  min-width: 150px;
-  min-height: 150px;
-  background-image: url("/static/survey/img/iconbasket.svg");
-  background-position: center;
-  background-size: contain;
+.groups {
+  padding: 65px 0 0 0;
+  margin: 20px;
+  min-width: 350px;
+  min-height: 350px;
   display: inline-block;
-  border-radius: 50%;
-
+  background-image: url("/static/survey/img/iconbasket.svg");
+  background-repeat: no-repeat;
+  background-size: 110% 100%;
+  background-position: center;
+  position: relative;
 }
 .user_group{
-  padding: 110px 50px 15px;
-  min-width: 100px;
-  min-height: 100px;
-  margin: 30px;
+  min-width: 100%;
+  min-height: 50%;
+  text-align: center;
+  position: absolute;
+  bottom: 13%;
+  margin: 0 auto;
 }
 .user_group .drag{
-  margin: 0 auto;
-  font-size: 15px;
+  margin: 10px auto;
+  font-size: 14px;
+  line-height: 18px;
+  max-width: 70%;
 }
-.inline, #section, #groups, .user_group{
+.inline, #section, #groups{
   display: inline-block;
   vertical-align: top;
 }

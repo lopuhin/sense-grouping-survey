@@ -120,10 +120,18 @@ function ctxDragDrop(ev) {
 
 function set_circle_size(id) {
     var group = $('#' + id).parent();
+    var k = group.parent();
+
     var width = group.width();
     var height = group.height();
-    if (width < height && group.hasClass('user_group')) {
-        group.css('width',height)
+    var hp = height/100*10 + height;
+    var wp = width/100*10 + width;
+
+    if (width<height && group.hasClass('user_group')) {
+        k.css('width',hp)
+    }
+    if (width>height && group.hasClass('user_group')) {
+        k.css('height',wp )
     }
 }
 
