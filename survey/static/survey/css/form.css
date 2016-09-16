@@ -115,6 +115,10 @@ input, .input, label{
 .mail_img img{
   width: 50%;
 }
+.screen{
+  margin: 20px 0;
+  width: 100%;
+}
 
 
 

@@ -17,9 +17,8 @@ span {
   
 }
 .groups {
-  padding: 65px 0 0 0;
   margin: 20px;
-  min-width: 350px;
+  min-width: 380px;
   min-height: 350px;
   display: inline-block;
   background-image: url("/static/survey/img/iconbasket.svg");
@@ -33,14 +32,14 @@ span {
   min-height: 50%;
   text-align: center;
   position: absolute;
-  bottom: 13%;
+  bottom: 12%;
   margin: 0 auto;
 }
 .user_group .drag{
   margin: 10px auto;
   font-size: 14px;
-  line-height: 18px;
-  max-width: 70%;
+  line-height: 17px;
+  max-width: 75%;
 }
 .inline, #section, #groups{
   display: inline-block;

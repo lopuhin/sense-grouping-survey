@@ -92,6 +92,7 @@ function dragStart(ev) {
     ev.dataTransfer.dropEffect = 'move';
     ev.dataTransfer.setData('Text', ev.target.getAttribute('id'));
     dragged_id = ev.target.getAttribute('id');
+    $('#' + dragged_id).css('color', '#999');
     return true;
 }
 
@@ -114,6 +115,7 @@ function ctxDragDrop(ev) {
     }
     set_circle_size(dragged_id);
     set_next_button_state();
+    $('#' + dragged_id).css('color', 'black');
     ev.stopPropagation();
     return false;
 }
