@@ -96,3 +96,10 @@ span {
   position: absolute;
   top: 1em;
 }
+#support {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  font-size: 13px;
+  margin: 0;
+}
