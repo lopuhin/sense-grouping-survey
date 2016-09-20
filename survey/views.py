@@ -233,7 +233,7 @@ def power(lst: List[T]) -> Iterable[Tuple[T, T]]:
 def participants_sheet(participants: Set[int]) -> Sheet:
     sheet = Sheet()
     fields = ['id', 'started', 'finished', 'profession', 'age', 'leading_hand',
-              'sex', 'languages', 'education', 'email', 'feedback']
+              'sex', 'languages', 'education', 'email', 'feedback', 'source']
     for col, field in enumerate(fields):
         sheet.write(0, col, field)
     row = 0
