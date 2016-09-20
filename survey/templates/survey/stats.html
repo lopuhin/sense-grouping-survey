@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <table>
+        <tr>
+            <th>Источник</th>
+            <th>Число участников</th>
+        </tr>
+        {% for source, count in participants_by_source %}
+            <tr>
+                <td>{{ source|default:"не задан" }}</td>
+                <td>{{ count }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -1,4 +1,4 @@
-import contextlib
+from collections import Counter
 import csv
 import json
 import os.path
@@ -103,6 +103,14 @@ class Feedback(View):
             return json_response({})
         else:
             return invalid_form_response(form)
+
+
+class Stats(View):
+    def get(self, request):
+        participants_by_source = Counter(
+            p.source for p in Participant.objects.all())
+        return render(request, 'survey/stats.html', {
+            'participants_by_source': sorted(participants_by_source.items())})
 
 
 class Export(View):
