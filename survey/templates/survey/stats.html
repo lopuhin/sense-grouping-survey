@@ -6,11 +6,13 @@
         <tr>
             <th>Источник</th>
             <th>Число участников</th>
+            <th>Дошли до конца</th>
         </tr>
-        {% for source, count in participants_by_source %}
+        {% for source, stats in stats_by_source %}
             <tr>
                 <td>{{ source|default:"не задан" }}</td>
-                <td>{{ count }}</td>
+                <td>{{ stats.started }}</td>
+                <td>{{ stats.finished }}</td>
             </tr>
         {% endfor %}
     </table>

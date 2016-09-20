@@ -8,6 +8,7 @@ from typing import Dict, Set, Tuple, List, Iterable, TypeVar
 import zipfile
 
 import attr
+from django.db.models import Count
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, reverse, HttpResponse
 from django.utils import timezone
@@ -107,10 +108,18 @@ class Feedback(View):
 
 class Stats(View):
     def get(self, request):
-        participants_by_source = Counter(
+        started_by_source = Counter(
             p.source for p in Participant.objects.all())
+        stats_by_source = {source: {'started': started, 'finished': 0}
+                          for source, started in started_by_source.items()}
+        n_context_sets = ContextSet.objects.count()
+        for x in (ContextGroup.objects
+                  .values('participant', 'participant__source')
+                  .annotate(Count('context_set', distinct=True))):
+            if x['context_set__count'] == n_context_sets:
+                stats_by_source[x['participant__source']]['finished'] += 1
         return render(request, 'survey/stats.html', {
-            'participants_by_source': sorted(participants_by_source.items())})
+            'stats_by_source': sorted(stats_by_source.items())})
 
 
 class Export(View):
