@@ -42,6 +42,7 @@ class Participant(models.Model):
         Education, verbose_name='Последняя законченная ступень образования')
     email = models.TextField(blank=True, default='')
     feedback = models.TextField(blank=True, default='')
+    source = models.TextField(blank=True, default='')
 
     class Meta:
         verbose_name = 'Испытуемый'

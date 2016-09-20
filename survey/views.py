@@ -21,6 +21,7 @@ class Start(View):
     def get(self, request):
         return render(request, 'survey/start.html', {
             'form': ParticipantForm(),
+            'source': request.GET.get('source', ''),
         })
 
     def post(self, request):

@@ -7,7 +7,7 @@ class ParticipantForm(forms.ModelForm):
     class Meta:
         model = Participant
         fields = ['profession', 'age', 'leading_hand', 'sex', 'languages',
-                  'education']
+                  'education', 'source']
         widgets = {
             'leading_hand': forms.Select(attrs={'class': 'input'}),
             'education': forms.Select(attrs={'class': 'input'}),
