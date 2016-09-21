@@ -1,17 +1,35 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+    <style>
+    table.results td, th {
+        min-width: 50px;
+        text-align: left;
+        padding-right: 10px;
+    }
+    </style>
+{% endblock %}
+
 {% block content %}
 
-    <table>
+    <table class="results">
         <tr>
             <th>Источник</th>
-            <th>Число участников</th>
+            <th>Участников</th>
+            <th>&ge; 10</th>
+            <th>&ge; 20</th>
+            <th>&ge; 30</th>
+            <th>&ge; 40</th>
             <th>Дошли до конца</th>
         </tr>
         {% for source, stats in stats_by_source %}
             <tr>
                 <td>{{ source|default:"не задан" }}</td>
                 <td>{{ stats.started }}</td>
+                <td>{{ stats.done_10 }}</td>
+                <td>{{ stats.done_20 }}</td>
+                <td>{{ stats.done_30 }}</td>
+                <td>{{ stats.done_40 }}</td>
                 <td>{{ stats.finished }}</td>
             </tr>
         {% endfor %}

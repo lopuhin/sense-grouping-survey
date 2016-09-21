@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 import csv
 import json
 import os.path
@@ -110,14 +110,21 @@ class Stats(View):
     def get(self, request):
         started_by_source = Counter(
             p.source for p in Participant.objects.all())
-        stats_by_source = {source: {'started': started, 'finished': 0}
+        stats_by_source = {source: defaultdict(int, started=started)
                           for source, started in started_by_source.items()}
         n_context_sets = ContextSet.objects.count()
         for x in (ContextGroup.objects
                   .values('participant', 'participant__source')
                   .annotate(Count('context_set', distinct=True))):
-            if x['context_set__count'] == n_context_sets:
-                stats_by_source[x['participant__source']]['finished'] += 1
+            count = x['context_set__count']
+            source = x['participant__source']
+            if count == n_context_sets:
+                stats_by_source[source]['finished'] += 1
+            threshold = 0
+            while threshold < n_context_sets:
+                threshold += 10
+                if count >= threshold:
+                    stats_by_source[source]['done_{}'.format(threshold)] += 1
         return render(request, 'survey/stats.html', {
             'stats_by_source': sorted(stats_by_source.items())})
 
