@@ -9,6 +9,7 @@ import zipfile
 
 import attr
 from django.db.models import Count
+from django.db import connection
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, reverse, HttpResponse
 from django.utils import timezone
@@ -135,11 +136,17 @@ class Export(View):
         n_context_sets = ContextSet.objects.count()
         named_contexts = get_named_contexts()
         only_complete = 'all' not in request.GET
-        for cs in ContextGroup.objects.prefetch_related('contexts'):
+        with connection.cursor() as cursor:
+            ctx_ids_by_cg = defaultdict(set)
+            cursor.execute('select contextgroup_id, context_id '
+                           'from survey_contextgroup_contexts')
+            for cg_id, ctx_id in cursor.fetchall():
+                ctx_ids_by_cg[cg_id].add(ctx_id)
+        for cg in ContextGroup.objects.all():
             (groups
-             .setdefault(cs.participant_id, {})
-             .setdefault(cs.context_set_id, [])
-             .append({ctx.id for ctx in cs.contexts.all()})
+             .setdefault(cg.participant_id, {})
+             .setdefault(cg.context_set_id, [])
+             .append(ctx_ids_by_cg[cg.id])
              )
         with tempfile.TemporaryDirectory() as dirname:
             folder_name = 'SGS_Survey_{}'.format(
