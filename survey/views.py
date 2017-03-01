@@ -112,7 +112,7 @@ class Stats(View):
         started_by_source = Counter(
             p.source for p in Participant.objects.all())
         stats_by_source = {source: defaultdict(int, started=started)
-                          for source, started in started_by_source.items()}
+                           for source, started in started_by_source.items()}
         n_context_sets = ContextSet.objects.count()
         for x in (ContextGroup.objects
                   .values('participant', 'participant__source')
@@ -127,7 +127,10 @@ class Stats(View):
                 if count >= threshold:
                     stats_by_source[source]['done_{}'.format(threshold)] += 1
         return render(request, 'survey/stats.html', {
-            'stats_by_source': sorted(stats_by_source.items())})
+            'stats_by_source': sorted(
+                (source, stats) for source, stats in stats_by_source.items()
+                if set(stats.keys()) != {'started'}
+            )})
 
 
 class Export(View):
