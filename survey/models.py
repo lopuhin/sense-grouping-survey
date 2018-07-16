@@ -57,6 +57,7 @@ class ContextSet(models.Model):
     """ A set of contexts to be grouped.
     """
     word = models.TextField()
+    is_filler = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = 'Набор контекстов для слова'
