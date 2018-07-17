@@ -34,12 +34,12 @@ class Start(View):
     def post(self, request):
         form = ParticipantForm(request.POST)
         if form.is_valid():
-            participant = form.save()
             cs_fillers, cs_stimuli = [], []
             for cs in ContextSet.objects.all():
                 (cs_fillers if cs.is_filler else cs_stimuli).append(cs)
             cs_to_group = (random.sample(cs_fillers, N_FILLERS) +
                            random.sample(cs_stimuli, N_STIMULI))
+            participant = form.save()
             participant.cs_to_group.add(*cs_to_group)
             return json_response(
                 {'next': reverse('survey_step', args=[participant])})

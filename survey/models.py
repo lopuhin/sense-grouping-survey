@@ -34,7 +34,7 @@ class Participant(models.Model):
     profession = models.TextField(verbose_name='Образование')
     age = models.PositiveIntegerField(verbose_name='Возраст')
     leading_hand = models.ForeignKey(LeadingHand, verbose_name='Ведущая рука')
-    sex = models.BooleanField(verbose_name='Пол')
+    sex = models.ForeignKey(Sex, verbose_name='Пол')
     languages = models.TextField(
         verbose_name='Родной язык/языки',
         help_text='пожалуйста, перечислите все')

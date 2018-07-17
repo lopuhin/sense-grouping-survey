@@ -21,12 +21,17 @@
 - model: survey.sex
   pk: 1
   fields:
-    name: женский
+    name: женщина
 
 - model: survey.sex
   pk: 2
   fields:
-    name: мужской
+    name: мужчина
+
+- model: survey.sex
+  pk: 3
+  fields:
+    name: другой
 
 - model: survey.education
   pk: 1

@@ -62,7 +62,7 @@ or load real contexts from a more convenient format
 
     ./manage.py load_contexts "example-contexts.csv"
     # or
-    ./manage.py load_contexts_with_fillers "example-contexts.csv"
+    ./manage.py load_contexts_with_fillers "example-contexts-with-fillers.csv"
 
 Create superuser::
 
