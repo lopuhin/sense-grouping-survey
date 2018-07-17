@@ -43,6 +43,7 @@ class Participant(models.Model):
     email = models.TextField(blank=True, default='')
     feedback = models.TextField(blank=True, default='')
     source = models.TextField(blank=True, default='')
+    cs_to_group = models.ManyToManyField('ContextSet')
 
     class Meta:
         verbose_name = 'Испытуемый'

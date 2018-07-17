@@ -19,6 +19,11 @@ from .forms import ParticipantForm, FeedbackForm
 from .models import Participant, ContextGroup, Context, ContextSet
 
 
+# Number of filler and stimuli for each participant
+N_FILLERS = 3
+N_STIMULI = 7
+
+
 class Start(View):
     def get(self, request):
         return render(request, 'survey/start.html', {
@@ -30,6 +35,12 @@ class Start(View):
         form = ParticipantForm(request.POST)
         if form.is_valid():
             participant = form.save()
+            cs_fillers, cs_stimuli = [], []
+            for cs in ContextSet.objects.all():
+                (cs_fillers if cs.is_filler else cs_stimuli).append(cs)
+            cs_to_group = (random.sample(cs_fillers, N_FILLERS) +
+                           random.sample(cs_stimuli, N_STIMULI))
+            participant.cs_to_group.add(*cs_to_group)
             return json_response(
                 {'next': reverse('survey_step', args=[participant])})
         else:
@@ -43,9 +54,11 @@ class Group(View):
             ContextGroup.objects.filter(participant=participant)
             .values_list('context_set_id', flat=True))
         to_group = {}
+        participant_cs_to_group = {
+            cs.id for cs in participant.cs_to_group.all()}
         for context in Context.objects.select_related('context_set'):
             cs = context.context_set
-            if cs.id not in grouped:
+            if cs.id not in grouped and cs.id in participant_cs_to_group:
                 cs_dict = to_group.setdefault(cs.id, {
                     'id': cs.id,
                     'word': capitalize_first(cs.word),
@@ -56,7 +69,7 @@ class Group(View):
         random.shuffle(to_group)
         if not to_group:
             return redirect('survey_feedback', participant)
-        total_to_group = ContextSet.objects.count()
+        total_to_group = len(participant_cs_to_group)
         return render(request, 'survey/group.html', {
             'participant': participant,
             'to_group': json.dumps(to_group),
@@ -77,7 +90,8 @@ class Group(View):
                     context_set = context.context_set
                     # clean up old contexts
                     (ContextGroup.objects
-                        .filter(participant=participant, context_set=context_set)
+                        .filter(participant=participant,
+                                context_set=context_set)
                         .delete())
             if group_contexts:
                 context_group = ContextGroup.objects.create(
