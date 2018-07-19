@@ -151,7 +151,7 @@ class Stats(View):
 class Export(View):
     def get(self, request):
         groups = {}  # participant_id -> context_set -> [{ctx}]
-        n_context_sets = ContextSet.objects.count()
+        n_context_sets = N_FILLERS + N_STIMULI
         named_contexts = get_named_contexts()
         only_complete = 'all' not in request.GET
         with connection.cursor() as cursor:
@@ -198,6 +198,7 @@ class Export(View):
 class NamedContext:
     idx = attr.ib()
     name = attr.ib()
+    is_filler = attr.ib()
 
 
 def get_named_contexts() -> Dict[int, NamedContext]:
@@ -205,14 +206,18 @@ def get_named_contexts() -> Dict[int, NamedContext]:
     cs_n = ctx_n = 0
     prev_cs = None
     for idx, ctx in enumerate(
-            Context.objects.order_by('context_set__id', 'order')):
+            Context.objects.select_related('context_set')
+                   .order_by('context_set__id', 'order')):
         if prev_cs is None or ctx.context_set_id != prev_cs:
             cs_n += 1
             ctx_n = 1
         else:
             ctx_n += 1
         named_contexts[ctx.id] = NamedContext(
-            idx=idx, name='set{}_stim{}'.format(cs_n, ctx_n))
+            idx=idx,
+            name='set{}_stim{}'.format(cs_n, ctx_n),
+            is_filler=ctx.context_set.is_filler,
+        )
         prev_cs = ctx.context_set_id
     return named_contexts
 
@@ -282,8 +287,6 @@ def participants_sheet(participants: Set[int]) -> Sheet:
             row += 1
             for col, field in enumerate(fields):
                 value = getattr(p, field)
-                if field == 'sex':
-                    value = ['male', 'female'][int(value)]
                 if not isinstance(value, int):
                     value = str(value or '')
                 sheet.write(row, col, value)
@@ -293,11 +296,18 @@ def participants_sheet(participants: Set[int]) -> Sheet:
 def contexts_sheet(named_contexts):
     sheet = Sheet()
     sheet.write(0, 0, 'id')
-    sheet.write(0, 1, 'word')
-    sheet.write(0, 2, 'context')
-    data = [(named_contexts[ctx.id].idx,
-             [named_contexts[ctx.id].name, ctx.context_set.word, ctx.text])
-            for ctx in Context.objects.select_related('context_set')]
+    sheet.write(0, 2, 'is_filler')
+    sheet.write(0, 3, 'word')
+    sheet.write(0, 4, 'context')
+    data = [(
+        named_contexts[ctx.id].idx,
+        [
+            named_contexts[ctx.id].name,
+            ctx.context_set.is_filler,
+            ctx.context_set.word,
+            ctx.text,
+        ])
+        for ctx in Context.objects.select_related('context_set')]
     data.sort()
     for idx, row in data:
         for col, val in enumerate(row):
