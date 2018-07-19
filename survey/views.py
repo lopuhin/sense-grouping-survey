@@ -188,8 +188,7 @@ class Export(View):
                     contexts_sheet(named_contexts), name='_contexts')
             with open(archive_path, 'rb') as f:
                 response = HttpResponse(
-                    f.read(), content_type='application/vnd.openxmlformats-'
-                                           'officedocument.spreadsheetml.sheet')
+                    f.read(), content_type='application/zip')
                 response['Content-Disposition'] = \
                     'attachment; filename="{}"'.format(archive_name)
                 return response
