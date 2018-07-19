@@ -59,6 +59,8 @@ class ContextSet(models.Model):
     """
     word = models.TextField()
     is_filler = models.BooleanField(default=False)
+    derivation = models.TextField(default='')
+    group = models.TextField(default='')
 
     class Meta:
         verbose_name = 'Набор контекстов для слова'

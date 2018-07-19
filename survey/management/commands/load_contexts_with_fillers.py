@@ -21,6 +21,8 @@ class Command(BaseCommand):
                     context_set = ContextSet.objects.create(
                         word=item['word'],
                         is_filler=item['type'] == 'fill',
+                        derivation=item['derivation'],
+                        group=item['group'],
                     )
                     order = 0
                 Context.objects.create(
