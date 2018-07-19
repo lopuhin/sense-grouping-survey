@@ -87,7 +87,6 @@ One easy but not optimal (it's better to put nginx in front)
 way is to use just ``gunicorn`` and ``supervisord``::
 
     sudo apt install supervisor
-    pip install gunicorn
     mkdir conf
 
 Then create ``conf/supervisor.conf`` file along this lines
