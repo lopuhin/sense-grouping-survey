@@ -20,6 +20,8 @@ from .models import Participant, ContextGroup, Context, ContextSet
 
 
 # Number of filler and stimuli for each participant
+# Note that stats view and template have hardcoded thresholds
+# which also need to be updated in case the total number of contexts changes.
 N_FILLERS = 3
 N_STIMULI = 7
 
@@ -127,7 +129,7 @@ class Stats(View):
             p.source for p in Participant.objects.all())
         stats_by_source = {source: defaultdict(int, started=started)
                            for source, started in started_by_source.items()}
-        n_context_sets = ContextSet.objects.count()
+        n_context_sets = N_STIMULI + N_FILLERS
         for x in (ContextGroup.objects
                   .values('participant', 'participant__source')
                   .annotate(Count('context_set', distinct=True))):
@@ -137,13 +139,12 @@ class Stats(View):
                 stats_by_source[source]['finished'] += 1
             threshold = 0
             while threshold < n_context_sets:
-                threshold += 10
+                threshold += 2
                 if count >= threshold:
                     stats_by_source[source]['done_{}'.format(threshold)] += 1
         return render(request, 'survey/stats.html', {
             'stats_by_source': sorted(
                 (source, stats) for source, stats in stats_by_source.items()
-                if set(stats.keys()) != {'started'}
             )})
 
 

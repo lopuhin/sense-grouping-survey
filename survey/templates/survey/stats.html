@@ -16,20 +16,20 @@
         <tr>
             <th>Источник</th>
             <th>Участников</th>
-            <th>&ge; 10</th>
-            <th>&ge; 20</th>
-            <th>&ge; 30</th>
-            <th>&ge; 40</th>
+            <th>&ge; 2</th>
+            <th>&ge; 4</th>
+            <th>&ge; 6</th>
+            <th>&ge; 8</th>
             <th>Дошли до конца</th>
         </tr>
         {% for source, stats in stats_by_source %}
             <tr>
                 <td>{{ source|default:"не задан" }}</td>
                 <td>{{ stats.started }}</td>
-                <td>{{ stats.done_10 }}</td>
-                <td>{{ stats.done_20 }}</td>
-                <td>{{ stats.done_30 }}</td>
-                <td>{{ stats.done_40 }}</td>
+                <td>{{ stats.done_2 }}</td>
+                <td>{{ stats.done_4 }}</td>
+                <td>{{ stats.done_6 }}</td>
+                <td>{{ stats.done_8 }}</td>
                 <td>{{ stats.finished }}</td>
             </tr>
         {% endfor %}
