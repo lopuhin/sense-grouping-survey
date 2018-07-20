@@ -21,7 +21,6 @@ class Command(BaseCommand):
                     context_set = ContextSet.objects.create(
                         word=item['word'],
                         is_filler=item['type'] == 'fill',
-                        derivation=item['derivation'],
                         group=item['group'],
                     )
                     order = 0
@@ -29,6 +28,7 @@ class Command(BaseCommand):
                     context_set=context_set,
                     order=float(order),
                     text=item['context'],
+                    derivation=item['derivation'],
                 )
                 prev_word = item['word']
                 order += 1

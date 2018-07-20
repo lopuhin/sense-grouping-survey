@@ -59,7 +59,6 @@ class ContextSet(models.Model):
     """
     word = models.TextField()
     is_filler = models.BooleanField(default=False)
-    derivation = models.TextField(default='')
     group = models.TextField(default='')
 
     class Meta:
@@ -74,6 +73,7 @@ class Context(models.Model):
     context_set = models.ForeignKey(ContextSet)
     order = models.FloatField()
     text = models.TextField()
+    derivation = models.TextField(default='')
 
     class Meta:
         verbose_name = 'Контекст'
