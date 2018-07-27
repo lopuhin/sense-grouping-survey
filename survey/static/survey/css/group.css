@@ -21,7 +21,7 @@ span {
   min-width: 380px;
   min-height: 350px;
   display: inline-block;
-  background-image: url("/static/survey/img/iconbasket.svg");
+  background-image: url("../img/iconbasket.svg");
   background-repeat: no-repeat;
   background-size: 110% 100%;
   background-position: center;
@@ -54,6 +54,8 @@ span {
     -webkit-box-shadow: 4px 4px 10px 1px rgba(0,0,0,0.35);
   -moz-box-shadow:43px 4px 10px 1px rgba(0,0,0,0.35);
   box-shadow: 4px 4px 10px 1px rgba(0,0,0,0.35);
+  font-size: 14px;
+  line-height: 17px;
 }
 #groups{
   padding: 10px 10px 100px;
