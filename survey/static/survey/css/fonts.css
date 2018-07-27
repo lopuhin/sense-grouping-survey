@@ -1,0 +1,24 @@
+@font-face {
+  font-family: 'Istok Web';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Istok Web Italic'), local('IstokWeb-Italic'), url(../font/3qTpojGmgSyUukBzKslpA1t53kM.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Istok Web';
+  font-style: italic;
+  font-weight: 700;
+  src: local('Istok Web Bold Italic'), local('IstokWeb-BoldItalic'), url(../font/3qT0ojGmgSyUukBzKslpA1PG-1MTSBY.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Istok Web';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Istok Web Regular'), local('IstokWeb-Regular'), url(../font/3qTvojGmgSyUukBzKslpAmt6.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Istok Web';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Istok Web Bold'), local('IstokWeb-Bold'), url(../font/3qTqojGmgSyUukBzKslhvU5q_WMQ.ttf) format('truetype');
+}
