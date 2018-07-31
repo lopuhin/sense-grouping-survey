@@ -16,10 +16,11 @@ class Command(BaseCommand):
             prev_word = None
             order = 0  # no explicit order in the file
             for item in reader:
+                word = item['word'].strip()
                 assert item['type'] in {'fill', 'stim'}
-                if prev_word != item['word']:
+                if prev_word != word:
                     context_set = ContextSet.objects.create(
-                        word=item['word'],
+                        word=word,
                         is_filler=item['type'] == 'fill',
                         group=item['group'],
                     )
@@ -30,5 +31,5 @@ class Command(BaseCommand):
                     text=item['context'],
                     derivation=item['derivation'],
                 )
-                prev_word = item['word']
+                prev_word = word
                 order += 1
