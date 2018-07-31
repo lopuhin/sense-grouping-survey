@@ -71,6 +71,8 @@ class Group(View):
         random.shuffle(to_group)
         if not to_group:
             return redirect('survey_feedback', participant)
+        for cs_dict in to_group:
+            random.shuffle(cs_dict['contexts'])
         total_to_group = len(participant_cs_to_group)
         return render(request, 'survey/group.html', {
             'participant': participant,
