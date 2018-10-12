@@ -25,6 +25,7 @@ class Command(BaseCommand):
             cgs_data.append({
                 'contexts': ' '.join(map(str, ctx_ids_by_cg[cg.id])),
                 'word': cg.context_set.word,
+                'cs': cg.context_set.id,
                 'is_filler': cg.context_set.is_filler,
                 'group': cg.context_set.group,
                 'participant': cg.participant.id,
@@ -32,12 +33,16 @@ class Command(BaseCommand):
             })
         df = pd.DataFrame(
             cgs_data,
-            columns=['participant', 'source', 'is_filler', 'word', 'group',
-                     'contexts']
+            columns=['participant', 'source', 'cs', 'is_filler', 'word',
+                     'group', 'contexts']
         )
         df.to_csv(main_csv, index=None)
         contexts_df = pd.DataFrame(
-            [{'id': c.id, 'derivation': c.derivation, 'text': c.text}
+            [{'id': c.id,
+              'derivation': c.derivation,
+              'text': c.text,
+              'cs': c.context_set.id,
+              }
              for c in Context.objects.all()],
-            columns=['id', 'derivation', 'text'])
+            columns=['id', 'cs', 'derivation', 'text'])
         contexts_df.to_csv(contexts_csv, index=None)
