@@ -21,7 +21,7 @@ class Command(BaseCommand):
                 ctx_ids_by_cg[cg_id].add(ctx_id)
         cgs_data = []
         for cg in (ContextGroup.objects
-                .select_related('participant', 'context_set')):
+                   .select_related('participant', 'context_set')):
             cgs_data.append({
                 'contexts': ' '.join(map(str, ctx_ids_by_cg[cg.id])),
                 'word': cg.context_set.word,

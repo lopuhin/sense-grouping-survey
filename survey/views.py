@@ -152,48 +152,53 @@ class Stats(View):
 
 class Export(View):
     def get(self, request):
-        groups = {}  # participant_id -> context_set -> [{ctx}]
-        n_context_sets = N_FILLERS + N_STIMULI
-        named_contexts = get_named_contexts()
-        only_complete = 'all' not in request.GET
-        with connection.cursor() as cursor:
-            ctx_ids_by_cg = defaultdict(set)
-            cursor.execute('select contextgroup_id, context_id '
-                           'from survey_contextgroup_contexts')
-            for cg_id, ctx_id in cursor.fetchall():
-                ctx_ids_by_cg[cg_id].add(ctx_id)
-        for cg in ContextGroup.objects.all():
-            (groups
-             .setdefault(cg.participant_id, {})
-             .setdefault(cg.context_set_id, [])
-             .append(ctx_ids_by_cg[cg.id])
-             )
-        with tempfile.TemporaryDirectory() as dirname:
-            folder_name = 'SGS_Survey_{}'.format(
-                timezone.now().strftime('%Y-%m-%d__%H_%M_%S'))
-            archive_name = '{}.zip'.format(folder_name)
-            archive_path = os.path.join(dirname, archive_name)
-            with zipfile.ZipFile(archive_path, 'w') as archive:
-                participants = set()
-                write_csv = lambda sheet, name: _write_csv(
-                    sheet, archive, dirname, folder_name, name=name)
-                for participant_id, p_groups in groups.items():
-                    if only_complete and len(p_groups) != n_context_sets:
-                        continue  # not all grouped
-                    participants.add(participant_id)
-                    write_csv(
-                        p_groups_sheet(named_contexts, p_groups),
-                        name=participant_id)
+        data, name = export_results(only_complete='all' not in request.GET)
+        response = HttpResponse(data, content_type='application/zip')
+        response['Content-Disposition'] = f'attachment; filename="{name}"'
+        return response
+
+
+def export_results(only_complete: bool) -> Tuple[bytes, str]:
+    groups = {}  # participant_id -> context_set -> [{ctx}]
+    named_contexts = get_named_contexts()
+    with connection.cursor() as cursor:
+        ctx_ids_by_cg = defaultdict(set)
+        cursor.execute('select contextgroup_id, context_id '
+                       'from survey_contextgroup_contexts')
+        for cg_id, ctx_id in cursor.fetchall():
+            ctx_ids_by_cg[cg_id].add(ctx_id)
+    for cg in ContextGroup.objects.all():
+        (groups
+         .setdefault(cg.participant_id, {})
+         .setdefault(cg.context_set_id, [])
+         .append(ctx_ids_by_cg[cg.id])
+         )
+    n_to_group = {
+        p.id: p.cs_to_group.count()
+        for p in Participant.objects.prefetch_related('cs_to_group').all()}
+    with tempfile.TemporaryDirectory() as dirname:
+        folder_name = 'SGS_Survey_{}'.format(
+            timezone.now().strftime('%Y-%m-%d__%H_%M_%S'))
+        archive_name = '{}.zip'.format(folder_name)
+        archive_path = os.path.join(dirname, archive_name)
+        with zipfile.ZipFile(archive_path, 'w') as archive:
+            participants = set()
+            write_csv = lambda sheet, name: _write_csv(
+                sheet, archive, dirname, folder_name, name=name)
+            for participant_id, p_groups in groups.items():
+                if only_complete and \
+                        len(p_groups) != n_to_group[participant_id]:
+                    continue  # not all grouped
+                participants.add(participant_id)
                 write_csv(
-                    participants_sheet(participants), name='_participants')
-                write_csv(
-                    contexts_sheet(named_contexts), name='_contexts')
-            with open(archive_path, 'rb') as f:
-                response = HttpResponse(
-                    f.read(), content_type='application/zip')
-                response['Content-Disposition'] = \
-                    'attachment; filename="{}"'.format(archive_name)
-                return response
+                    p_groups_sheet(named_contexts, p_groups),
+                    name=participant_id)
+            write_csv(
+                participants_sheet(participants), name='_participants')
+            write_csv(
+                contexts_sheet(named_contexts), name='_contexts')
+        with open(archive_path, 'rb') as f:
+            return f.read(), archive_name
 
 
 @attr.s
