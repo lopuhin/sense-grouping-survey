@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import UUID
 
 from django.core.management.base import BaseCommand
 
@@ -16,8 +17,15 @@ class Command(BaseCommand):
             '--participant-ids',
             help='a text file with participant ids')
 
-    def handle(self, output_zip, **options):
-        # TODO filter participants
-        data, _ = export_results(only_complete=options['all'])
+    def handle(self, output_zip, participant_ids=None, **options):
+        assert output_zip.endswith('.zip')
+        folder_name, _ = output_zip.rsplit('.zip', 1)
+        if participant_ids:
+            participant_ids = {
+                UUID(line.strip()) for line in
+                Path(participant_ids).read_text('utf8').splitlines()}
+        data, _ = export_results(
+            folder_name,
+            only_complete=options['all'],
+            participant_ids=participant_ids)
         Path(output_zip).write_bytes(data)
-

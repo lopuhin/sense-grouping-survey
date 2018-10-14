@@ -4,7 +4,8 @@ import json
 import os.path
 import random
 import tempfile
-from typing import Dict, Set, Tuple, List, Iterable, TypeVar
+from typing import Dict, Set, Tuple, List, Iterable, TypeVar, Optional
+from uuid import UUID
 import zipfile
 
 import attr
@@ -152,13 +153,20 @@ class Stats(View):
 
 class Export(View):
     def get(self, request):
-        data, name = export_results(only_complete='all' not in request.GET)
+        folder_name = 'SGS_Survey_{}'.format(
+            timezone.now().strftime('%Y-%m-%d__%H_%M_%S'))
+        data, name = export_results(
+            folder_name, only_complete='all' not in request.GET)
         response = HttpResponse(data, content_type='application/zip')
         response['Content-Disposition'] = f'attachment; filename="{name}"'
         return response
 
 
-def export_results(only_complete: bool) -> Tuple[bytes, str]:
+def export_results(
+        folder_name: str,
+        only_complete: bool,
+        participant_ids: Optional[Set[UUID]] = None,
+        ) -> Tuple[bytes, str]:
     groups = {}  # participant_id -> context_set -> [{ctx}]
     named_contexts = get_named_contexts()
     with connection.cursor() as cursor:
@@ -177,8 +185,6 @@ def export_results(only_complete: bool) -> Tuple[bytes, str]:
         p.id: p.cs_to_group.count()
         for p in Participant.objects.prefetch_related('cs_to_group').all()}
     with tempfile.TemporaryDirectory() as dirname:
-        folder_name = 'SGS_Survey_{}'.format(
-            timezone.now().strftime('%Y-%m-%d__%H_%M_%S'))
         archive_name = '{}.zip'.format(folder_name)
         archive_path = os.path.join(dirname, archive_name)
         with zipfile.ZipFile(archive_path, 'w') as archive:
@@ -186,6 +192,9 @@ def export_results(only_complete: bool) -> Tuple[bytes, str]:
             write_csv = lambda sheet, name: _write_csv(
                 sheet, archive, dirname, folder_name, name=name)
             for participant_id, p_groups in groups.items():
+                if participant_ids is not None and \
+                        participant_id not in participant_ids:
+                    continue
                 if only_complete and \
                         len(p_groups) != n_to_group[participant_id]:
                     continue  # not all grouped
