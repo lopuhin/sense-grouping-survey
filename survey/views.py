@@ -204,8 +204,7 @@ def export_results(
                     p_groups_sheet(named_contexts, p_groups),
                     name=participant_id)
             write_csv(participants_df(participants), name='personal')
-            write_csv(
-                contexts_sheet(named_contexts), name='_contexts')
+            write_csv(words_sheet(named_contexts), name='words')
         with open(archive_path, 'rb') as f:
             return f.read(), archive_name
 
@@ -310,26 +309,14 @@ def participants_df(participants: Set[int]) -> pd.DataFrame:
     return df
 
 
-def contexts_sheet(named_contexts):
-    sheet = Sheet()
-    sheet.write(0, 0, 'id')
-    sheet.write(0, 2, 'is_filler')
-    sheet.write(0, 3, 'word')
-    sheet.write(0, 4, 'context')
-    data = [(
-        named_contexts[ctx.id].idx,
-        [
-            named_contexts[ctx.id].name,
-            ctx.context_set.is_filler,
-            ctx.context_set.word,
-            ctx.text,
-        ])
-        for ctx in Context.objects.select_related('context_set')]
-    data.sort()
-    for idx, row in data:
-        for col, val in enumerate(row):
-            sheet.write(idx + 1, col, val)
-    return sheet
+def words_sheet(named_contexts: Dict[int, NamedContext]) -> pd.DataFrame:
+    data = {(
+        ctx.context_set.word,
+        'POS_UNK',
+        named_contexts[ctx.id].name.split('_')[0] + '_',
+    ) for ctx in Context.objects.select_related('context_set')}
+    data = sorted(data, key=lambda x: int(x[2][3:-1]))
+    return pd.DataFrame(data, columns=['word', 'POS', 'set'])
 
 
 def _write_csv(
