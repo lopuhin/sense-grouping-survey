@@ -3,7 +3,7 @@ from uuid import UUID
 
 from django.core.management.base import BaseCommand
 
-from survey.views import export_results
+from survey.export import export_results
 
 
 class Command(BaseCommand):
