@@ -206,9 +206,9 @@ def export_results(
                 participants.add(participant_id)
                 write_csv(
                     p_groups_sheet(named_contexts, p_groups),
-                    name=participant_id)
+                    name='individual/{}'.format(participant_id))
             write_csv(participants_df(participants), name='personal')
-            write_csv(words_sheet(named_contexts), name='words')
+            write_csv(words_df(named_contexts), name='words')
         with open(archive_path, 'rb') as f:
             return f.read(), archive_name
 
@@ -315,7 +315,7 @@ def participants_df(participants: Set[int]) -> pd.DataFrame:
     return df
 
 
-def words_sheet(named_contexts: Dict[int, NamedContext]) -> pd.DataFrame:
+def words_df(named_contexts: Dict[int, NamedContext]) -> pd.DataFrame:
     data = {
         (ctx.context_set.word,
          'POS_UNK',
@@ -333,6 +333,9 @@ def _write_csv(
         dirname, folder_name, name):
     filename = '{}.csv'.format(name)
     full_path = os.path.join(dirname, filename)
+    parent = os.path.dirname(full_path)
+    if not os.path.exists(parent):
+        os.mkdir(parent)
     with open(full_path, 'wt') as f:
         if isinstance(data, Sheet):
             data.write_csv(f)
