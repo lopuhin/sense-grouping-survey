@@ -10,6 +10,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('output_zip')
         parser.add_argument(
+            '--cs-group', help='export only specified ContextSet group')
+        parser.add_argument(
             '--all', action='store_true',
             help='export even results for participants who '
                  'didn\'t finish all tasks')
@@ -17,7 +19,8 @@ class Command(BaseCommand):
             '--participant-ids',
             help='a text file with participant ids')
 
-    def handle(self, output_zip, participant_ids=None, **options):
+    def handle(self, output_zip, participant_ids=None, cs_group=None,
+               **options):
         assert output_zip.endswith('.zip')
         folder_name, _ = output_zip.rsplit('.zip', 1)
         if participant_ids:
@@ -27,5 +30,7 @@ class Command(BaseCommand):
         data, _ = export_results(
             folder_name,
             only_complete=options['all'],
-            participant_ids=participant_ids)
+            participant_ids=participant_ids,
+            cs_group=cs_group,
+        )
         Path(output_zip).write_bytes(data)

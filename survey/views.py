@@ -167,16 +167,20 @@ def export_results(
         folder_name: str,
         only_complete: bool,
         participant_ids: Optional[Set[UUID]] = None,
+        cs_group: Optional[str] = None,
         ) -> Tuple[bytes, str]:
     groups = {}  # participant_id -> context_set -> [{ctx}]
-    named_contexts = get_named_contexts()
+    named_contexts = get_named_contexts(cs_group=cs_group)
     with connection.cursor() as cursor:
         ctx_ids_by_cg = defaultdict(set)
         cursor.execute('select contextgroup_id, context_id '
                        'from survey_contextgroup_contexts')
         for cg_id, ctx_id in cursor.fetchall():
             ctx_ids_by_cg[cg_id].add(ctx_id)
-    for cg in ContextGroup.objects.all():
+    cg_qs = ContextGroup.objects.all()
+    if cs_group:
+        cg_qs = cg_qs.filter(context_set__group=cs_group)
+    for cg in cg_qs:
         (groups
          .setdefault(cg.participant_id, {})
          .setdefault(cg.context_set_id, [])
@@ -216,13 +220,15 @@ class NamedContext:
     is_filler = attr.ib()
 
 
-def get_named_contexts() -> Dict[int, NamedContext]:
+def get_named_contexts(
+        cs_group: Optional[str] = None) -> Dict[int, NamedContext]:
     named_contexts = {}
     cs_n = ctx_n = 0
     prev_cs = None
-    for idx, ctx in enumerate(
-            Context.objects.select_related('context_set')
-                   .order_by('context_set__id', 'order')):
+    qs = Context.objects.select_related('context_set')
+    if cs_group is not None:
+        qs = qs.filter(context_set__group=cs_group)
+    for idx, ctx in enumerate(qs.order_by('context_set__id', 'order')):
         if prev_cs is None or ctx.context_set_id != prev_cs:
             cs_n += 1
             ctx_n = 1
@@ -310,11 +316,13 @@ def participants_df(participants: Set[int]) -> pd.DataFrame:
 
 
 def words_sheet(named_contexts: Dict[int, NamedContext]) -> pd.DataFrame:
-    data = {(
-        ctx.context_set.word,
-        'POS_UNK',
-        named_contexts[ctx.id].name.split('_')[0] + '_',
-    ) for ctx in Context.objects.select_related('context_set')}
+    data = {
+        (ctx.context_set.word,
+         'POS_UNK',
+         named_contexts[ctx.id].name.split('_')[0] + '_',
+         )
+        for ctx in Context.objects.select_related('context_set')
+        if ctx.id in named_contexts}
     data = sorted(data, key=lambda x: int(x[2][3:-1]))
     return pd.DataFrame(data, columns=['word', 'POS', 'set'])
 
