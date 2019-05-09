@@ -61,6 +61,8 @@ def export_results(
             true_groups = get_true_groups(named_contexts)
             write_csv(p_groups_sheet(named_contexts, true_groups),
                       name='model_classification')
+            write_csv(all_pairs_df(named_contexts, true_groups),
+                      name='pairs_full')
         with open(archive_path, 'rb') as f:
             return f.read(), archive_name
 
@@ -155,6 +157,47 @@ def get_true_groups(
          .setdefault(key, set()).add(context.id))
     return {cs_id: list(p_groups.values())
             for cs_id, p_groups in true_groups.items()}
+
+
+def all_pairs_df(named_contexts: Dict[int, NamedContext],
+                 true_groups: Dict[int, List[Set[int]]]) -> pd.DataFrame:
+    data = []
+    ctx_by_id = {ctx.id: ctx
+                 for ctx in Context.objects.select_related('context_set')}
+    for group in true_groups.values():
+        group_ids = {i for g in group for i in g}
+        group_contexts = [(i, named_contexts[i]) for i in group_ids]
+        derivations = {ctx_by_id[i].derivation.strip() for i in group_ids}
+        der_to_g = {der: idx for idx, der in enumerate(sorted(derivations), 1)}
+        for id_1, ctx_1 in group_contexts:
+            set_1, stim_1 = ctx_1.name.split('_')
+            for id_2, ctx_2 in group_contexts:
+                set_2, stim_2 = ctx_2.name.split('_')
+                assert set_1 == set_2
+                der_1 = ctx_by_id[id_1].derivation.strip()
+                der_2 = ctx_by_id[id_2].derivation.strip()
+                g_1 = der_to_g[der_1]
+                g_2 = der_to_g[der_2]
+                data.append({
+                    'X1st.part': ctx_1.name,
+                    'X2nd.part': ctx_2.name,
+                    'pair': '{}_{}{}'.format(set_1, stim_1, stim_2),
+                    'word': ctx_by_id[id_1].context_set.word,
+                    'X1st.part.derivation': der_1,
+                    'X2st.part.derivation': der_2,
+                    'group.1st.part': g_1,
+                    'group.2nd.part': g_2,
+                    'pair.derivation': '{}.{}'.format(der_1, der_2),
+                    'pair.group': '{}.{}'.format(g_1, g_2),
+                    'correct': int(der_1 == der_2),
+                })
+    return pd.DataFrame(data, columns=[
+        'X2nd.part', 'X1st.part', 'pair',
+        'word',
+        'X1st.part.derivation', 'X2st.part.derivation',
+        'group.1st.part', 'group.2nd.part',
+        'pair.derivation', 'pair.group', 'correct',
+    ])
 
 
 T = TypeVar('T')
