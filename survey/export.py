@@ -54,11 +54,13 @@ def export_results(
                         len(p_groups) != n_to_group[participant_id]:
                     continue  # not all grouped
                 participants.add(participant_id)
-                write_csv(
-                    p_groups_sheet(named_contexts, p_groups),
-                    name='individual/{}'.format(participant_id))
+                write_csv(p_groups_sheet(named_contexts, p_groups),
+                          name='individual/{}'.format(participant_id))
             write_csv(participants_df(participants), name='personal')
             write_csv(words_df(named_contexts), name='words')
+            true_groups = get_true_groups(named_contexts)
+            write_csv(p_groups_sheet(named_contexts, true_groups),
+                      name='model_classification')
         with open(archive_path, 'rb') as f:
             return f.read(), archive_name
 
@@ -109,7 +111,9 @@ class Sheet:
                 self.data.get((row, col), '') for col in range(n_cols + 1)])
 
 
-def p_groups_sheet(named_contexts, p_groups) -> Sheet:
+def p_groups_sheet(
+        named_contexts: Dict[int, NamedContext],
+        p_groups: Dict[int, List[Set[int]]]) -> Sheet:
     sheet = Sheet()
     # write header
     for named in sorted(
@@ -137,6 +141,20 @@ def p_groups_sheet(named_contexts, p_groups) -> Sheet:
                     sheet.write(idx1, idx2, 0)
 
     return sheet
+
+
+def get_true_groups(
+        named_contexts: Dict[int, NamedContext]) -> Dict[int, List[Set[int]]]:
+    true_groups = {}
+    for context in Context.objects.all():
+        if context.id not in named_contexts:
+            continue
+        key = context.derivation.strip()
+        (true_groups
+         .setdefault(context.context_set_id, {})
+         .setdefault(key, set()).add(context.id))
+    return {cs_id: list(p_groups.values())
+            for cs_id, p_groups in true_groups.items()}
 
 
 T = TypeVar('T')
