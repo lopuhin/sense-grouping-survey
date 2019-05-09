@@ -4,7 +4,7 @@ import json
 import os.path
 import random
 import tempfile
-from typing import Dict, Set, Tuple, List, Iterable, TypeVar, Optional
+from typing import Dict, Set, Tuple, List, Iterable, TypeVar, Optional, Union
 from uuid import UUID
 import zipfile
 
@@ -15,6 +15,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import render, redirect, reverse, HttpResponse
 from django.utils import timezone
 from django.views import View
+import pandas as pd
 
 from .forms import ParticipantForm, FeedbackForm
 from .models import Participant, ContextGroup, Context, ContextSet
@@ -202,8 +203,7 @@ def export_results(
                 write_csv(
                     p_groups_sheet(named_contexts, p_groups),
                     name=participant_id)
-            write_csv(
-                participants_sheet(participants), name='_participants')
+            write_csv(participants_df(participants), name='personal')
             write_csv(
                 contexts_sheet(named_contexts), name='_contexts')
         with open(archive_path, 'rb') as f:
@@ -291,22 +291,23 @@ def power(lst: List[T]) -> Iterable[Tuple[T, T]]:
     return ((a, b) for a in lst for b in lst)
 
 
-def participants_sheet(participants: Set[int]) -> Sheet:
-    sheet = Sheet()
-    fields = ['id', 'started', 'finished', 'profession', 'age', 'leading_hand',
-              'sex', 'languages', 'education', 'email', 'feedback', 'source']
-    for col, field in enumerate(fields):
-        sheet.write(0, col, field)
-    row = 0
+def participants_df(participants: Set[int]) -> pd.DataFrame:
+    fields = ['person.id', 'profession', 'age', 'leading_hand', 'sex',
+              'languages', 'education']
+    data = []
     for p in Participant.objects.select_related('leading_hand', 'education'):
         if p.id in participants:
-            row += 1
+            row = {}
             for col, field in enumerate(fields):
-                value = getattr(p, field)
+                model_field = {'person.id': 'id'}.get(field, field)
+                value = getattr(p, model_field)
                 if not isinstance(value, int):
                     value = str(value or '')
-                sheet.write(row, col, value)
-    return sheet
+                row[field] = value
+            data.append(row)
+    df = pd.DataFrame(data, columns=fields)
+    df['type'] = 'naive'
+    return df
 
 
 def contexts_sheet(named_contexts):
@@ -332,11 +333,16 @@ def contexts_sheet(named_contexts):
 
 
 def _write_csv(
-        sheet: Sheet, archive: zipfile.ZipFile, dirname, folder_name, name):
+        data: Union[Sheet, pd.DataFrame],
+        archive: zipfile.ZipFile,
+        dirname, folder_name, name):
     filename = '{}.csv'.format(name)
     full_path = os.path.join(dirname, filename)
     with open(full_path, 'wt') as f:
-        sheet.write_csv(f)
+        if isinstance(data, Sheet):
+            data.write_csv(f)
+        else:
+            data.to_csv(f, sep=';', index=None)
     archive.write(
         full_path, arcname='{}/{}'.format(folder_name, filename))
 
