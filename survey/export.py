@@ -17,10 +17,10 @@ def export_results(
         folder_name: str,
         only_complete: bool,
         participant_ids: Optional[Set[UUID]] = None,
-        cs_group: Optional[str] = None,
+        skip_fillers: bool = True,
         ) -> Tuple[bytes, str]:
     groups = {}  # participant_id -> context_set -> [{ctx}]
-    named_contexts = get_named_contexts(cs_group=cs_group)
+    named_contexts = get_named_contexts(skip_fillers=skip_fillers)
     with connection.cursor() as cursor:
         ctx_ids_by_cg = defaultdict(set)
         cursor.execute('select contextgroup_id, context_id '
@@ -28,8 +28,8 @@ def export_results(
         for cg_id, ctx_id in cursor.fetchall():
             ctx_ids_by_cg[cg_id].add(ctx_id)
     cg_qs = ContextGroup.objects.all()
-    if cs_group:
-        cg_qs = cg_qs.filter(context_set__group=cs_group)
+    if skip_fillers:
+        cg_qs = cg_qs.filter(context_set__is_filler=False)
     for cg in cg_qs:
         (groups
          .setdefault(cg.participant_id, {})
@@ -75,14 +75,16 @@ class NamedContext:
 
 
 def get_named_contexts(
-        cs_group: Optional[str] = None) -> Dict[int, NamedContext]:
+        skip_fillers: bool = True,
+        ) -> Dict[int, NamedContext]:
     named_contexts = {}
     cs_n = ctx_n = 0
     prev_cs = None
     qs = Context.objects.select_related('context_set')
-    if cs_group is not None:
-        qs = qs.filter(context_set__group=cs_group)
     for idx, ctx in enumerate(qs.order_by('context_set__id', 'order')):
+        is_filler = ctx.context_set.is_filler
+        if skip_fillers and is_filler:
+            continue
         if prev_cs is None or ctx.context_set_id != prev_cs:
             cs_n += 1
             ctx_n = 1
@@ -91,7 +93,7 @@ def get_named_contexts(
         named_contexts[ctx.id] = NamedContext(
             idx=idx,
             name='set{}_stim{}'.format(cs_n, ctx_n),
-            is_filler=ctx.context_set.is_filler,
+            is_filler=is_filler,
         )
         prev_cs = ctx.context_set_id
     return named_contexts
@@ -229,13 +231,13 @@ def participants_df(participants: Set[int]) -> pd.DataFrame:
 def words_df(named_contexts: Dict[int, NamedContext]) -> pd.DataFrame:
     data = {
         (ctx.context_set.word,
-         'POS_UNK',
+         ctx.context_set.group,
          named_contexts[ctx.id].name.split('_')[0] + '_',
          )
         for ctx in Context.objects.select_related('context_set')
         if ctx.id in named_contexts}
     data = sorted(data, key=lambda x: int(x[2][3:-1]))
-    return pd.DataFrame(data, columns=['word', 'POS', 'set'])
+    return pd.DataFrame(data, columns=['word', 'group', 'set'])
 
 
 def _write_csv(
