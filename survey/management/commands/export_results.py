@@ -26,6 +26,7 @@ class Command(BaseCommand):
                 Path(participant_ids).read_text('utf8').splitlines()}
         data, _ = export_results(
             folder_name,
+            # FIXME this is wrong but it does not work in any case
             only_complete=options['all'],
             participant_ids=participant_ids,
         )
