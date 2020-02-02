@@ -209,12 +209,12 @@ def power(lst: List[T]) -> Iterable[Tuple[T, T]]:
     return ((a, b) for a in lst for b in lst)
 
 
-def participants_df(participants: Set[int]) -> pd.DataFrame:
+def participants_df(participant_ids: Set=None) -> pd.DataFrame:
     fields = ['person.id', 'profession', 'age', 'leading_hand', 'sex',
               'languages', 'education']
     data = []
     for p in Participant.objects.select_related('leading_hand', 'education'):
-        if p.id in participants:
+        if participant_ids is None or p.id in participant_ids:
             row = {}
             for col, field in enumerate(fields):
                 model_field = {'person.id': 'id'}.get(field, field)
