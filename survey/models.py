@@ -33,13 +33,14 @@ class Participant(models.Model):
     finished = models.DateTimeField(auto_now=True)
     profession = models.TextField(verbose_name='Образование')
     age = models.PositiveIntegerField(verbose_name='Возраст')
-    leading_hand = models.ForeignKey(LeadingHand, verbose_name='Ведущая рука')
-    sex = models.ForeignKey(Sex, verbose_name='Пол')
+    leading_hand = models.ForeignKey(LeadingHand, verbose_name='Ведущая рука', on_delete=models.CASCADE)
+    sex = models.ForeignKey(Sex, verbose_name='Пол', on_delete=models.CASCADE)
     languages = models.TextField(
         verbose_name='Родной язык/языки',
         help_text='пожалуйста, перечислите все')
     education = models.ForeignKey(
-        Education, verbose_name='Последняя законченная ступень образования')
+        Education, verbose_name='Последняя законченная ступень образования',
+        on_delete=models.CASCADE)
     email = models.TextField(blank=True, default='')
     feedback = models.TextField(blank=True, default='')
     source = models.TextField(blank=True, default='')
@@ -70,7 +71,7 @@ class ContextSet(models.Model):
 
 
 class Context(models.Model):
-    context_set = models.ForeignKey(ContextSet)
+    context_set = models.ForeignKey(ContextSet, on_delete=models.CASCADE)
     order = models.FloatField()
     text = models.TextField()
     derivation = models.TextField(default='')
@@ -87,8 +88,8 @@ class Context(models.Model):
 class ContextGroup(models.Model):
     """ A grouping of contexts by a participant.
     """
-    participant = models.ForeignKey(Participant)
-    context_set = models.ForeignKey(ContextSet)
+    participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
+    context_set = models.ForeignKey(ContextSet, on_delete=models.CASCADE)
     contexts = models.ManyToManyField(Context)
 
     class Meta:

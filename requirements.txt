@@ -1,5 +1,6 @@
-attrs==16
-Django==1.10
+attrs
+Django==2.2.19
 gunicorn==19.6.0
 PyYAML==3.11
-pytz==2016.6.1
+numpy==1.20.1
+pandas==1.2.2
