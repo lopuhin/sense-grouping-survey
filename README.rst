@@ -36,14 +36,14 @@ Install (short version)::
 
     pip install -r requirements.txt
 
-In more detail, assuming Ubuntu 16.04:
+In more detail, assuming Ubuntu 20.04:
 
-    sudo apt install python3.5-venv python3-dev
+    sudo apt install python3-venv python3-dev
     git clone git@github.com:lopuhin/sense-grouping-survey.git
     cd sense-grouping-survey
     python3 -m venv venv
     . venv/bin/activate
-    pip install pip wheel -U
+    pip install pip -U
     pip install -r requirements.txt
 
 Data is stored in an SQLite database in ``./db.sqlite3``.
@@ -87,14 +87,13 @@ One easy but not optimal (it's better to put nginx in front)
 way is to use just ``gunicorn`` and ``supervisord``::
 
     sudo apt install supervisor
-    mkdir conf
 
-Then create ``conf/supervisor.conf`` file along this lines
+Then create ``sgs.supervisor.conf`` file along this lines
 (again, this is far from ideal in many cases, just an example)::
 
     [program:sgs]
     environment=SECRET_KEY="generate some secret key, dont share it!"
-    command=/root/sense-grouping-survey/venv/bin/gunicorn sgs.wsgi -b 0.0.0.0:80 -w 4 --timeout 60 --access-logfile=/root/sense-grouping-survey/access.log --access-logformat '%%(h)s %%(l)s %%(u)s %%(t)s "%%(r)s" %%(s)s %%(b)s "%%(f)s" "%%(a)s" %%(f)s'
+    command=/root/sense-grouping-survey/venv/bin/gunicorn sgs.wsgi -b 127.0.0.1:8000 -w 4 --timeout 60 --access-logfile=/root/sense-grouping-survey/access.log --access-logformat '%%(h)s %%(l)s %%(u)s %%(t)s "%%(r)s" %%(s)s %%(b)s "%%(f)s" "%%(a)s" %%(f)s'
     directory=/root/sense-grouping-survey/
     autostart=true
     autorestart=true
@@ -105,3 +104,4 @@ and then do::
 
     supervisorctl start sgs
 
+and then set up proxy via nginx.
